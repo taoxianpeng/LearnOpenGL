@@ -223,7 +223,7 @@ int main(int argc, char** argv) {
 		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
 		ourShader.setMat4("model", model);
-		ourShader.setVec3("light.positon", light_position);
+		ourShader.setVec3("light.position", light_position);
 		ourShader.setVec3("light.diffuse", light_material.diffuse);
 		ourShader.setVec3("viewPos", camera.Position);
 		ourShader.setFloat("light.constant", 1.0f);
