@@ -4,6 +4,7 @@
 # 设置可执行文件的名字
 set(EXECUTABLE_NAME "LearnOpengl")
 
+
 include_directories(
 	thirdParty/glfw/include
 	thirdParty/glad/include
@@ -13,8 +14,10 @@ include_directories(
 	thirdParty/imgui
 	thirdParty/imgui/backends
 	thirdParty/spdlog/include
-
+	wrapper
 )
+
+add_subdirectory(wrapper)
 
 # 将源代码添加到此项目的可执行文件。
 file(GLOB SRC_FILES src/*.cpp src/*.c src/*.h)
@@ -31,7 +34,7 @@ target_link_directories(${EXECUTABLE_NAME} PRIVATE
 	thirdParty/assimp/lib
 )
 
-target_link_libraries(${EXECUTABLE_NAME} glfw3 glew32 assimp-vc143-mt)
+target_link_libraries(${EXECUTABLE_NAME} glfw3 glew32 assimp-vc143-mt wrapper)
 
 
 # TODO: 如有需要，请添加测试并安装目标。
