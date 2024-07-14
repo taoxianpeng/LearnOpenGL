@@ -44,10 +44,11 @@ static unsigned int TextureFromFile(std::string_view path) {
 }
 
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,
-	std::vector<Texture> textures) {
+	std::vector<Texture> textures, Material mat) {
 	this->vertices = vertices;
 	this->indices = indices;
 	this->textures = textures;
+	this->mats = mats;
 
 	setupMesh();
 }
@@ -70,7 +71,9 @@ void Mesh::draw(Shader& shader) {
 	}
 	glActiveTexture(GL_TEXTURE0);
 
+	//spdlog::info("******* mesh color:{},{},{}", mats.Kd.r, mats.Kd.g, mats.Kd.b);
 	glBindVertexArray(VAO);
+	glBindBufferRange(GL_UNIFORM_BUFFER, 0, uniformBlockIndex, 0, sizeof(Material));
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }
@@ -79,12 +82,16 @@ void Mesh::setupMesh() {
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &EBO);
+	glGenBuffers(1, &uniformBlockIndex);
 
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
 	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0],
 		GL_STATIC_DRAW);
+
+	glBindBuffer(GL_UNIFORM_BUFFER, uniformBlockIndex);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(mats), (void*)(&mats), GL_STATIC_DRAW);
+
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int),
@@ -197,10 +204,27 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 		}
 	}
 
+	Material mat;
+		
 	// 加载材质
 	if (mesh->mMaterialIndex >= 0) {
+
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-		// 将漫反射材质 和 镜面材质都加载到一个数组中
+
+		//加载纯色材质
+		aiColor3D color;
+		material->Get(AI_MATKEY_COLOR_AMBIENT, color);
+		mat.Ka = glm::vec4(color.r, color.g, color.b, 1.0);
+		spdlog::info("ambient :{},{},{}", color.r, color.g, color.b);
+		material->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+		spdlog::info("diffuse :{},{},{}", color.r, color.g, color.b);
+		mat.Kd = glm::vec4(color.r, color.g, color.b, 1.0);
+		material->Get(AI_MATKEY_COLOR_SPECULAR, color);
+		spdlog::info("specular :{},{},{}", color.r, color.g, color.b);
+		mat.Ks = glm::vec4(color.r, color.g, color.b, 1.0);
+
+
+		// 将漫反射纹理材质 和 镜面纹理材质都加载到一个数组中
 		std::vector<Texture> diffuse_texture = loadMaterialTextures(
 			material, aiTextureType_DIFFUSE, "texture_diffuse");
 		textures.insert(textures.end(), diffuse_texture.begin(),
@@ -211,7 +235,7 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 			specular_texture.end());
 	}
 	spdlog::info("mesh texture count:{}", textures.size());
-	return Mesh(vertices, indices, textures);
+	return Mesh(vertices, indices, textures, mat);
 }
 
 std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat,

@@ -101,9 +101,12 @@ int main(int argc, char** argv) {
 	std::string fragPath = resourcePath + "/shader/shader.frag";
 	std::string modelPath = resourcePath + "/assert/nanosuit/nanosuit.obj";
 
+	std::string axioPath = resourcePath + "/assert/axio/axio.obj";
+
 	spdlog::info("vertPath:{}", vertPath);
 	spdlog::info("fragPath:{}", fragPath);
 	spdlog::info("modelPath:{}", modelPath);
+	spdlog::info("AxioPath:{}", axioPath);
 
 	Shader ourShader(vertPath, fragPath);
 	MMesh::Model ourModel(modelPath);
@@ -115,6 +118,12 @@ int main(int argc, char** argv) {
 
 	Shader sunShader(vertPath, fragPath);
 	MMesh::Model sunModel(modelPath);
+
+	// axio
+	vertPath = resourcePath + "/shader/axio.vert";
+	fragPath = resourcePath + "/shader/axio.frag";
+	Shader axioShader(vertPath, fragPath);
+	MMesh::Model axioModel(axioPath);
 
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
@@ -239,6 +248,18 @@ int main(int argc, char** argv) {
 		model = glm::translate(model, light_position);
 		sunShader.setMat4("model", model);
 		sunModel.draw(sunShader);
+
+		// axio
+		glEnable(GL_DEPTH_TEST);
+		axioShader.use();
+		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+		axioShader.setMat4("view", view);
+		axioShader.setMat4("projection", projection);
+		axioShader.setMat4("model", model);
+		axioModel.draw(axioShader);
+
+
 
 		// 2. Show a simple window that we create ourselves. We use a Begin/End pair
 		// to create a named window.

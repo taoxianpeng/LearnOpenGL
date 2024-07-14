@@ -1,4 +1,4 @@
-#ifndef MESH_H
+﻿#ifndef MESH_H
 #define MESH_H
 
 #include <glm.hpp>
@@ -27,20 +27,28 @@ struct Texture {
   std::string path;
 };
 
+struct Material {
+    glm::vec4 Ka; //环境光
+    glm::vec4 Kd; //漫反射
+    glm::vec4 Ks; //镜面反射
+};
+
 class Mesh {
  public:
   explicit Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,
-                std::vector<Texture> textures);
+                std::vector<Texture> textures,Material mats);
   void draw(Shader &shader);
 
   // 网格数据
   std::vector<Vertex> vertices;
   std::vector<Texture> textures;
   std::vector<unsigned int> indices;
+  Material mats;
 
  private:
   /*  渲染数据  */
   unsigned int VAO, VBO, EBO;
+  unsigned int uniformBlockIndex;
   /*  函数  */
   void setupMesh();
 };
