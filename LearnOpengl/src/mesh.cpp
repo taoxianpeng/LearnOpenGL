@@ -48,7 +48,7 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,
 	this->vertices = vertices;
 	this->indices = indices;
 	this->textures = textures;
-	this->mats = mats;
+	this->mats = mat;
 
 	setupMesh();
 }
@@ -135,7 +135,9 @@ import.ReadFile(path.data(), aiProcess_FlipUVs | aiProcess_Triangulate);
 void Model::processNode(aiNode* node, const aiScene* scene) {
 	for (auto i = 0; i < node->mNumMeshes; i++) {
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-		meshes.emplace_back(processMesh(mesh, scene));
+		auto item = processMesh(mesh, scene);
+		meshes.emplace_back(item);
+		spdlog::info("Kd color:{}, {}, {}", item.mats.Kd.r, item.mats.Kd.g, item.mats.Kd.b);
 	}
 	for (auto i = 0; i < node->mNumChildren; i++) {
 		processNode(node->mChildren[i], scene);
@@ -205,7 +207,7 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 	}
 
 	Material mat;
-		
+
 	// 加载材质
 	if (mesh->mMaterialIndex >= 0) {
 
@@ -214,14 +216,14 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 		//加载纯色材质
 		aiColor3D color;
 		material->Get(AI_MATKEY_COLOR_AMBIENT, color);
-		mat.Ka = glm::vec4(color.r, color.g, color.b, 1.0);
-		spdlog::info("ambient :{},{},{}", color.r, color.g, color.b);
+		mat.Ka = glm::vec4(color.r, color.g, color.b, 1.0f);
+		spdlog::info("ambient :{},{},{} | {}", mat.Ka.r, mat.Ka.g, mat.Ka.b, mat.Ka.a);
 		material->Get(AI_MATKEY_COLOR_DIFFUSE, color);
-		spdlog::info("diffuse :{},{},{}", color.r, color.g, color.b);
-		mat.Kd = glm::vec4(color.r, color.g, color.b, 1.0);
+		mat.Kd = glm::vec4(color.r, color.g, color.b, 1.0f);
+		spdlog::info("diffuse :{},{},{} | {}", mat.Kd.r, mat.Kd.g, mat.Kd.b, mat.Kd.a);
 		material->Get(AI_MATKEY_COLOR_SPECULAR, color);
-		spdlog::info("specular :{},{},{}", color.r, color.g, color.b);
-		mat.Ks = glm::vec4(color.r, color.g, color.b, 1.0);
+		mat.Ks = glm::vec4(color.r, color.g, color.b, 1.0f);
+		spdlog::info("specular :{},{},{} | {}", mat.Ks.r, mat.Ks.g, mat.Ks.b, mat.Ks.a);
 
 
 		// 将漫反射纹理材质 和 镜面纹理材质都加载到一个数组中
@@ -235,7 +237,10 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 			specular_texture.end());
 	}
 	spdlog::info("mesh texture count:{}", textures.size());
-	return Mesh(vertices, indices, textures, mat);
+	auto mMesh = Mesh(vertices, indices, textures, mat);
+	spdlog::info("Kd color:{}, {}, {}", mMesh.mats.Kd.r, mMesh.mats.Kd.g, mMesh.mats.Kd.b);
+
+	return mMesh;
 }
 
 std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat,

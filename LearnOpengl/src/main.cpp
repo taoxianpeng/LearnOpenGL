@@ -150,6 +150,10 @@ int main(int argc, char** argv) {
 	// 开启深度检测
 	glEnable(GL_DEPTH_TEST);
 
+	// 开启模板检测
+	glEnable(GL_STENCIL_TEST);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+
 	// light
 	static Light light_material;
 	light_material.ambient = glm::vec3(1.0f, 0.5f, 0.31f);
@@ -213,9 +217,10 @@ int main(int argc, char** argv) {
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(
 			GL_COLOR_BUFFER_BIT |
-			GL_DEPTH_BUFFER_BIT);
-
-		ourShader.use();
+			GL_DEPTH_BUFFER_BIT |
+			GL_STENCIL_BUFFER_BIT
+		);
+		
 
 		// create transformations
 		glm::mat4 view = camera.GetViewMatrix();
@@ -226,7 +231,12 @@ int main(int argc, char** argv) {
 		glm::mat4 model = glm::mat4(1.0f);
 
 		// view = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
+		
+		//模板测试 Start
+		glStencilFunc(GL_ALWAYS, 1, 0xff);
+		glStencilMask(0xff);
 
+		ourShader.use();
 		ourShader.setMat4("view", view);
 		ourShader.setMat4("projection", projection);
 		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
@@ -239,6 +249,9 @@ int main(int argc, char** argv) {
 		ourShader.setFloat("light.linear", 0.09f);
 		ourShader.setFloat("light.quadratic", 0.032f);
 		ourModel.draw(ourShader);
+		
+		
+		//模板测试 End
 
 		// sun
 		sunShader.use();
