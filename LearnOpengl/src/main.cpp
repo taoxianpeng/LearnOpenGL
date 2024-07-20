@@ -111,6 +111,9 @@ int main(int argc, char** argv) {
 	Shader ourShader(vertPath, fragPath);
 	MMesh::Model ourModel(modelPath);
 
+	//模型边缘绘制
+	std::string shaderSingleColorFragPath = resourcePath + "/shader/singleColor.frag";
+
 	// sun
 	vertPath = resourcePath + "/shader/sun.vert";
 	fragPath = resourcePath + "/shader/sun.frag";
@@ -119,11 +122,14 @@ int main(int argc, char** argv) {
 	Shader sunShader(vertPath, fragPath);
 	MMesh::Model sunModel(modelPath);
 
+	Shader singleColorShader(vertPath, shaderSingleColorFragPath);
+
 	// axio
 	vertPath = resourcePath + "/shader/axio.vert";
 	fragPath = resourcePath + "/shader/axio.frag";
 	Shader axioShader(vertPath, fragPath);
 	MMesh::Model axioModel(axioPath);
+
 
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
@@ -152,7 +158,7 @@ int main(int argc, char** argv) {
 
 	// 开启模板检测
 	glEnable(GL_STENCIL_TEST);
-	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE); //第三个参数一定得是GL_REPLACE 否则模板缓冲区的值不会变
 
 	// light
 	static Light light_material;
@@ -220,8 +226,9 @@ int main(int argc, char** argv) {
 			GL_DEPTH_BUFFER_BIT |
 			GL_STENCIL_BUFFER_BIT
 		);
-		
 
+
+		glStencilMask(0x00);
 		// create transformations
 		glm::mat4 view = camera.GetViewMatrix();
 		glm::mat4 projection = glm::perspective(
@@ -231,10 +238,7 @@ int main(int argc, char** argv) {
 		glm::mat4 model = glm::mat4(1.0f);
 
 		// view = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
-		
-		//模板测试 Start
-		glStencilFunc(GL_ALWAYS, 1, 0xff);
-		glStencilMask(0xff);
+
 
 		ourShader.use();
 		ourShader.setMat4("view", view);
@@ -248,22 +252,45 @@ int main(int argc, char** argv) {
 		ourShader.setFloat("light.constant", 1.0f);
 		ourShader.setFloat("light.linear", 0.09f);
 		ourShader.setFloat("light.quadratic", 0.032f);
+
+
 		ourModel.draw(ourShader);
-		
-		
-		//模板测试 End
+
+
+		//模板测试 Start
+		glStencilFunc(GL_ALWAYS, 1, 0xff);
+		glStencilMask(0xff);
 
 		// sun
 		sunShader.use();
 		sunShader.setMat4("view", view);
 		sunShader.setMat4("projection", projection);
-
 		model = glm::translate(model, light_position);
 		sunShader.setMat4("model", model);
+
 		sunModel.draw(sunShader);
 
-		// axio
+		glStencilFunc(GL_NOTEQUAL, 1, 0xff); // 后续绘制模板缓冲区为1的位置
+		glStencilMask(0x00); // 后续绘制不更新模板缓冲区
+		glDisable(GL_DEPTH_TEST);
+
+		float scale = 1.1f;
+		singleColorShader.use();
+		singleColorShader.setMat4("view", view);
+		singleColorShader.setMat4("projection", projection);
+		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(scale, scale, scale));
+		singleColorShader.setMat4("model", model);
+
+		sunModel.draw(singleColorShader);
+
+		glStencilMask(0xff);
+		glStencilFunc(GL_ALWAYS, 1, 0xff);
 		glEnable(GL_DEPTH_TEST);
+
+		//模板测试 End
+
+		// axio
 		axioShader.use();
 		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
@@ -271,8 +298,6 @@ int main(int argc, char** argv) {
 		axioShader.setMat4("projection", projection);
 		axioShader.setMat4("model", model);
 		axioModel.draw(axioShader);
-
-
 
 		// 2. Show a simple window that we create ourselves. We use a Begin/End pair
 		// to create a named window.
