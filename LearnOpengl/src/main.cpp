@@ -145,6 +145,16 @@ int main(int argc, char** argv) {
 		1, 2, 3
 	};
 
+	std::vector<glm::vec3> windows
+	{
+		glm::vec3(-1.5f, 0.0f, -0.48f),
+		glm::vec3(1.5f, 0.0f, 0.51f),
+		glm::vec3(0.0f, 0.0f, 0.7f),
+		glm::vec3(-0.3f, 0.0f, -2.3f),
+		glm::vec3(0.5f, 0.0f, -0.6f)
+	};
+
+
 	GLuint VAO = 0, VBO = 0, EBO = 0;
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
@@ -195,7 +205,7 @@ int main(int argc, char** argv) {
 	// 开启模板检测
 	glEnable(GL_STENCIL_TEST);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE); //第三个参数一定得是GL_REPLACE 否则模板缓冲区的值不会变
-	
+
 	// 开启混合
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -278,6 +288,11 @@ int main(int argc, char** argv) {
 			GL_STENCIL_BUFFER_BIT
 		);
 
+		std::map<float, glm::vec3> sorted;
+		for (auto i = 0; i < windows.size(); ++i) {
+			float distance = glm::length(camera.Position - windows[i]);
+			sorted[distance] = windows[i];
+		}
 
 		glStencilMask(0x00);
 		// create transformations
@@ -351,17 +366,19 @@ int main(int argc, char** argv) {
 		axioShader.setMat4("model", model);
 		axioModel.draw(axioShader);
 
-	
+
 		quartShader.use();
+		glBindVertexArray(VAO);
+		quartTex.useTexture(0);
 		quartShader.setMat4("view", view);
 		quartShader.setMat4("projection", projection);
-		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 10.0f));
-		quartShader.setMat4("model", model);
-		quartTex.useTexture(0);
-		glBindVertexArray(VAO);
-		//glDrawArrays(GL_TRIANGLES, 0, 6);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-		//spdlog::error("draw error: {}", glGetError());
+		for (const auto& [distace, transformation] : sorted) {
+			model = glm::translate(model, transformation);
+			quartShader.setMat4("model", model);
+			//glDrawArrays(GL_TRIANGLES, 0, 6);
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+			//spdlog::error("draw error: {}", glGetError());
+		}
 		glBindVertexArray(0);
 		// 2. Show a simple window that we create ourselves. We use a Begin/End pair
 		// to create a named window.
