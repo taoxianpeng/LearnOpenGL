@@ -14,8 +14,8 @@ Texture::Texture()
 	texture(0),
 	textureWrapS(GL_REPEAT),
 	textureWrapT(GL_REPEAT),
-	textureMinFilter(GL_LINE),
-	textureMaxFilter(GL_LINE),
+	textureMinFilter(GL_LINEAR),
+	textureMaxFilter(GL_LINEAR),
 	texWidth(0),
 	texHeight(0),
 	texChannal(0) {}
@@ -75,20 +75,21 @@ unsigned int Texture::loadTextureFromFile(std::string_view path) {
 		glTexImage2D(GL_TEXTURE_2D, 0, format, texWidth, texHeight, 0, format,
 			GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
-
+		
 		setTextureMode(textureWrapS, textureWrapT, textureMinFilter,
 			textureMaxFilter);
 	}
 	else {
 		std::cout << "Texture failed to load at path: " << path << std::endl;
+		return -1;
 	}
 	stbi_image_free(data);
 	return textureID;
 }
 
 void Texture::genTexture() {
-	glGenTextures(1, (GLuint*)&texture);
+	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
 }
 
-void Texture::freeTexture() const { glDeleteTextures(1, (GLuint*)&texture); };
+void Texture::freeTexture() const { glDeleteTextures(1, &texture); };

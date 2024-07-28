@@ -15,6 +15,7 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "mesh.h"
+#include "texture.h"
 
 using namespace std;
 
@@ -131,6 +132,41 @@ int main(int argc, char** argv) {
 	MMesh::Model axioModel(axioPath);
 
 
+	/* 构建窗户 Start */
+	float verties[] = {
+		-0.5f, -0.5, 0.0f, 0.0f, 0.0f,
+		0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+		0.5f, 0.5f, 0.0f, 1.0f, 1.0f,
+		-0.5f, 0.5f, 0.0f, 0.0f, 1.0f
+	};
+
+	unsigned int indices[] = {
+		0, 1, 3,
+		1, 2, 3
+	};
+
+	GLuint VAO = 0, VBO = 0, EBO = 0;
+	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &VBO);
+	glGenBuffers(1, &EBO);
+
+	glBindVertexArray(VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(verties), verties, GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(0));
+	glEnableVertexAttribArray(0);
+
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+	/* 构建窗户 End */
+
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -159,6 +195,10 @@ int main(int argc, char** argv) {
 	// 开启模板检测
 	glEnable(GL_STENCIL_TEST);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE); //第三个参数一定得是GL_REPLACE 否则模板缓冲区的值不会变
+	
+	// 开启混合
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// light
 	static Light light_material;
@@ -175,6 +215,17 @@ int main(int argc, char** argv) {
 	object_material.shininess = 32.0f;
 
 	static glm::vec3 light_position = glm::vec3(1.0f, 1.0f, 1.0f);
+
+	// 加载纹理
+	Texture quartTex;
+	spdlog::error("0 error: {}", glGetError());
+
+	quartTex.create("C:\\Users\\txp\\source\\repos\\LearnOpengl\\LearnOpengl\\src\\assert\\blending_transparent_window.PNG");
+	vertPath = resourcePath + "/shader/window.vert";
+	fragPath = resourcePath + "/shader/window.frag";
+	spdlog::error("1 error: {}", glGetError());
+	Shader quartShader(vertPath, fragPath);
+
 
 	while (!glfwWindowShouldClose(window)) {
 		// Poll and handle events (inputs, window resize, etc.)
@@ -288,6 +339,7 @@ int main(int argc, char** argv) {
 		glStencilFunc(GL_ALWAYS, 1, 0xff);
 		glEnable(GL_DEPTH_TEST);
 
+		//spdlog::error("error: {}", glGetError());
 		//模板测试 End
 
 		// axio
@@ -299,6 +351,18 @@ int main(int argc, char** argv) {
 		axioShader.setMat4("model", model);
 		axioModel.draw(axioShader);
 
+	
+		quartShader.use();
+		quartShader.setMat4("view", view);
+		quartShader.setMat4("projection", projection);
+		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 10.0f));
+		quartShader.setMat4("model", model);
+		quartTex.useTexture(0);
+		glBindVertexArray(VAO);
+		//glDrawArrays(GL_TRIANGLES, 0, 6);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		//spdlog::error("draw error: {}", glGetError());
+		glBindVertexArray(0);
 		// 2. Show a simple window that we create ourselves. We use a Begin/End pair
 		// to create a named window.
 		{
@@ -351,6 +415,8 @@ int main(int argc, char** argv) {
 		glBindBuffer(1, 0);
 	}
 
+	glDeleteBuffers(1, &VBO);
+	glDeleteBuffers(1, &EBO);
 	// Cleanup
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
