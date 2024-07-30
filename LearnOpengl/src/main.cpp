@@ -357,6 +357,10 @@ int main(int argc, char** argv) {
 		//spdlog::error("error: {}", glGetError());
 		//模板测试 End
 
+		// 面剔除
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
+
 		// axio
 		axioShader.use();
 		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
