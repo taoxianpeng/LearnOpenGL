@@ -177,6 +177,38 @@ int main(int argc, char** argv) {
 	glBindVertexArray(0);
 	/* 构建窗户 End */
 
+	// 帧缓冲 Start
+	unsigned int offRenderTexture = 0;
+	glGenTextures(1, &offRenderTexture);
+	glBindTexture(GL_TEXTURE_2D, offRenderTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	// 设置纹理环绕方式
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	unsigned int fbo = 0;
+	glGenFramebuffers(1, &fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, offRenderTexture, 0);
+
+	//// create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
+	//unsigned int rbo;
+	//glGenRenderbuffers(1, &rbo);
+	//glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+	//glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, SCR_WIDTH, SCR_HEIGHT); // use a single renderbuffer object for both a depth AND stencil buffer.
+	//glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo); // now actually attach it
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		spdlog::error("ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	// 帧缓冲 End
+
+
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -238,6 +270,7 @@ int main(int argc, char** argv) {
 
 
 	while (!glfwWindowShouldClose(window)) {
+		spdlog::error("test error: {}", glGetError());
 		// Poll and handle events (inputs, window resize, etc.)
 		// You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to
 		// tell if dear imgui wants to use your inputs.
@@ -280,6 +313,7 @@ int main(int argc, char** argv) {
 		}
 
 		// Rendering
+		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(
@@ -287,6 +321,7 @@ int main(int argc, char** argv) {
 			GL_DEPTH_BUFFER_BIT |
 			GL_STENCIL_BUFFER_BIT
 		);
+
 
 		std::map<float, glm::vec3> sorted;
 		for (auto i = 0; i < windows.size(); ++i) {
@@ -350,10 +385,10 @@ int main(int argc, char** argv) {
 
 		sunModel.draw(singleColorShader);
 
+
 		glStencilMask(0xff);
 		glStencilFunc(GL_ALWAYS, 1, 0xff);
 		glEnable(GL_DEPTH_TEST);
-
 		//spdlog::error("error: {}", glGetError());
 		//模板测试 End
 
@@ -371,9 +406,21 @@ int main(int argc, char** argv) {
 		axioModel.draw(axioShader);
 
 
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glDisable(GL_DEPTH_TEST);
+
+		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		glClear(
+			GL_COLOR_BUFFER_BIT |
+			GL_DEPTH_BUFFER_BIT |
+			GL_STENCIL_BUFFER_BIT
+		);
+
 		quartShader.use();
 		glBindVertexArray(VAO);
-		quartTex.useTexture(0);
+		//quartTex.useTexture(0);
+		glActiveTexture(0);
+		glBindTexture(GL_TEXTURE_2D, offRenderTexture);
 		quartShader.setMat4("view", view);
 		quartShader.setMat4("projection", projection);
 		for (const auto& [distace, transformation] : sorted) {
@@ -383,6 +430,7 @@ int main(int argc, char** argv) {
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 			//spdlog::error("draw error: {}", glGetError());
 		}
+
 		glBindVertexArray(0);
 		// 2. Show a simple window that we create ourselves. We use a Begin/End pair
 		// to create a named window.
