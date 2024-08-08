@@ -62,6 +62,13 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 	glViewport(0, 0, width, height);
 }
 
+void framebufferWindow(GLuint textureID) {
+	ImGui::Begin("Preview window");
+	float scale_factor = std::min((float)ImGui::GetContentRegionAvail().x / 800.0f, (float)ImGui::GetContentRegionAvail().y / 600.0f);
+	ImGui::Image((ImTextureID)(intptr_t)textureID, ImVec2(800 * scale_factor, 600 * scale_factor), ImVec2(1, 1), ImVec2(0, 0));
+	ImGui::End();
+}
+
 int main(int argc, char** argv) {
 	glfwSetErrorCallback(glfw_error_callback);
 	if (!glfwInit()) return 1;
@@ -418,9 +425,9 @@ int main(int argc, char** argv) {
 
 		quartShader.use();
 		glBindVertexArray(VAO);
-		//quartTex.useTexture(0);
-		glActiveTexture(0);
-		glBindTexture(GL_TEXTURE_2D, offRenderTexture);
+		quartTex.useTexture(0);
+		//glActiveTexture(0);
+		//glBindTexture(GL_TEXTURE_2D, quartTex);
 		quartShader.setMat4("view", view);
 		quartShader.setMat4("projection", projection);
 		for (const auto& [distace, transformation] : sorted) {
@@ -430,6 +437,10 @@ int main(int argc, char** argv) {
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 			//spdlog::error("draw error: {}", glGetError());
 		}
+
+		//glActiveTexture(0);
+		//glBindTexture(GL_TEXTURE_2D, offRenderTexture);
+		framebufferWindow(offRenderTexture);
 
 		glBindVertexArray(0);
 		// 2. Show a simple window that we create ourselves. We use a Begin/End pair
