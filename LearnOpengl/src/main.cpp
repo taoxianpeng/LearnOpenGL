@@ -17,6 +17,8 @@
 #include "mesh.h"
 #include "texture.h"
 
+#include "stb_image.h"
+
 using namespace std;
 
 struct Material {
@@ -53,6 +55,7 @@ void processInput(GLFWwindow* window);
 
 void mouse_callback(GLFWwindow* window, double xposIn, double yposIn);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+unsigned int loadCubeMap(const vector<string>& faces);
 
 static void glfw_error_callback(int error, const char* description) {
 	fprintf(stderr, "GLFW Error %d: %s\n", error, description);
@@ -184,22 +187,7 @@ int main(int argc, char** argv) {
 	glBindVertexArray(0);
 	/* 构建窗户 End */
 
-	// 帧缓冲 Start
-	unsigned int offRenderTexture = 0;
-	glGenTextures(1, &offRenderTexture);
-	glBindTexture(GL_TEXTURE_2D, offRenderTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-	// 设置纹理环绕方式
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	unsigned int fbo = 0;
-	glGenFramebuffers(1, &fbo);
-	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, offRenderTexture, 0);
 
 	//// create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
 	//unsigned int rbo;
@@ -238,16 +226,6 @@ int main(int argc, char** argv) {
 	bool show_another_window = false;
 	glm::vec4 clear_color(0.45f, 0.55f, 0.60f, 1.00f);
 
-	// 开启深度检测
-	glEnable(GL_DEPTH_TEST);
-
-	// 开启模板检测
-	glEnable(GL_STENCIL_TEST);
-	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE); //第三个参数一定得是GL_REPLACE 否则模板缓冲区的值不会变
-
-	// 开启混合
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// light
 	static Light light_material;
@@ -267,29 +245,15 @@ int main(int argc, char** argv) {
 
 	// 加载纹理
 	Texture quartTex;
-	spdlog::error("0 error: {}", glGetError());
 
 	quartTex.create("C:\\Users\\txp\\source\\repos\\LearnOpengl\\LearnOpengl\\src\\assert\\blending_transparent_window.PNG");
 	vertPath = resourcePath + "/shader/window.vert";
 	fragPath = resourcePath + "/shader/window.frag";
-	spdlog::error("1 error: {}", glGetError());
 	Shader quartShader(vertPath, fragPath);
 
 
 	while (!glfwWindowShouldClose(window)) {
-		spdlog::error("test error: {}", glGetError());
-		// Poll and handle events (inputs, window resize, etc.)
-		// You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to
-		// tell if dear imgui wants to use your inputs.
-		// - When io.WantCaptureMouse is true, do not dispatch mouse input data to
-		// your main application, or clear/overwrite your copy of the mouse data.
-		// - When io.WantCaptureKeyboard is true, do not dispatch keyboard input
-		// data to your main application, or clear/overwrite your copy of the
-		// keyboard data. Generally you may always pass all inputs to dear imgui,
-		// and hide them from your application based on those two flags.
-
-		// 触发按钮，则退出
-
+		
 		processInput(window);
 		glfwPollEvents();
 
@@ -302,9 +266,6 @@ int main(int argc, char** argv) {
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		// 1. Show the big demo window (Most of the sample code is in
-		// ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear
-		// ImGui!).
 		if (show_demo_window) ImGui::ShowDemoWindow(&show_demo_window);
 
 		// 3. Show another simple window.
@@ -320,8 +281,6 @@ int main(int argc, char** argv) {
 		}
 
 		// Rendering
-		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(
 			GL_COLOR_BUFFER_BIT |
@@ -330,13 +289,6 @@ int main(int argc, char** argv) {
 		);
 
 
-		std::map<float, glm::vec3> sorted;
-		for (auto i = 0; i < windows.size(); ++i) {
-			float distance = glm::length(camera.Position - windows[i]);
-			sorted[distance] = windows[i];
-		}
-
-		glStencilMask(0x00);
 		// create transformations
 		glm::mat4 view = camera.GetViewMatrix();
 		glm::mat4 projection = glm::perspective(
@@ -344,8 +296,6 @@ int main(int argc, char** argv) {
 			static_cast<float>(SCR_WIDTH) / static_cast<float>(SCR_HEIGHT), 0.1f,
 			100.0f);
 		glm::mat4 model = glm::mat4(1.0f);
-
-		// view = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
 
 
 		ourShader.use();
@@ -364,11 +314,6 @@ int main(int argc, char** argv) {
 
 		ourModel.draw(ourShader);
 
-
-		//模板测试 Start
-		glStencilFunc(GL_ALWAYS, 1, 0xff);
-		glStencilMask(0xff);
-
 		// sun
 		sunShader.use();
 		sunShader.setMat4("view", view);
@@ -377,10 +322,6 @@ int main(int argc, char** argv) {
 		sunShader.setMat4("model", model);
 
 		sunModel.draw(sunShader);
-
-		glStencilFunc(GL_NOTEQUAL, 1, 0xff); // 后续绘制模板缓冲区为1的位置
-		glStencilMask(0x00); // 后续绘制不更新模板缓冲区
-		glDisable(GL_DEPTH_TEST);
 
 		float scale = 1.1f;
 		singleColorShader.use();
@@ -392,17 +333,6 @@ int main(int argc, char** argv) {
 
 		sunModel.draw(singleColorShader);
 
-
-		glStencilMask(0xff);
-		glStencilFunc(GL_ALWAYS, 1, 0xff);
-		glEnable(GL_DEPTH_TEST);
-		//spdlog::error("error: {}", glGetError());
-		//模板测试 End
-
-		// 面剔除
-		glEnable(GL_CULL_FACE);
-		glCullFace(GL_BACK);
-
 		// axio
 		axioShader.use();
 		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
@@ -412,35 +342,6 @@ int main(int argc, char** argv) {
 		axioShader.setMat4("model", model);
 		axioModel.draw(axioShader);
 
-
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glDisable(GL_DEPTH_TEST);
-
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glClear(
-			GL_COLOR_BUFFER_BIT |
-			GL_DEPTH_BUFFER_BIT |
-			GL_STENCIL_BUFFER_BIT
-		);
-
-		quartShader.use();
-		glBindVertexArray(VAO);
-		quartTex.useTexture(0);
-		//glActiveTexture(0);
-		//glBindTexture(GL_TEXTURE_2D, quartTex);
-		quartShader.setMat4("view", view);
-		quartShader.setMat4("projection", projection);
-		for (const auto& [distace, transformation] : sorted) {
-			model = glm::translate(model, transformation);
-			quartShader.setMat4("model", model);
-			//glDrawArrays(GL_TRIANGLES, 0, 6);
-			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-			//spdlog::error("draw error: {}", glGetError());
-		}
-
-		//glActiveTexture(0);
-		//glBindTexture(GL_TEXTURE_2D, offRenderTexture);
-		framebufferWindow(offRenderTexture);
 
 		glBindVertexArray(0);
 		// 2. Show a simple window that we create ourselves. We use a Begin/End pair
@@ -492,7 +393,14 @@ int main(int argc, char** argv) {
 
 		// 解除绑定
 		glBindVertexArray(0);
-		glBindBuffer(1, 0);
+		//glBindBuffer(1, 0);
+
+#ifdef _DEBUG
+		if (0 != glGetError()) {
+			spdlog::error("test error: {}", glGetError());
+		}
+#endif // DEBUG
+
 	}
 
 	glDeleteBuffers(1, &VBO);
@@ -567,5 +475,33 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn) {
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
 	camera.ProcessMouseScroll(static_cast<float>(yoffset));
+}
+
+unsigned int loadCubeMap(const vector<string>& faces)
+{
+	GLuint textureID;
+	glGenTextures(1, &textureID);
+	glBindBuffer(GL_TEXTURE_CUBE_MAP, textureID);
+
+	int width, height, nrChannels;
+	for (auto i = 0; i < faces.size(); ++i) {
+		unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+		if (data) {
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, static_cast<void*>(data));
+		}
+		else {
+			spdlog::error("Cubmap texture failed to load at path:{}", faces[i]);
+		}
+		stbi_image_free(data);
+	}
+
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+	return textureID;
+
 }
 
