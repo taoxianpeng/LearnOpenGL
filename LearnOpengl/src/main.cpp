@@ -4,40 +4,23 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <glm.hpp>
-#include <gtc/matrix_transform.hpp>
-#include <gtc/type_ptr.hpp>
 #include <spdlog/spdlog.h>
 #include <checkError.h>
 
+#define STB_IMAGE_IMPLEMENTATION
+
 #include "camera.h"
+#include "common.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "mesh.h"
 #include "texture.h"
 
-#include "stb_image.h"
+#include "big_man_model.h"
 
 using namespace std;
 
-struct Material {
-	glm::vec3 ambient;
-	glm::vec3 diffuse;
-	glm::vec3 speculer;
-	float shininess;
-};
-
-struct Light {
-	glm::vec3 position;
-	glm::vec3 ambient;
-	glm::vec3 diffuse;
-	glm::vec3 speculer;
-
-	float constant;
-	float linear;
-	float quadratic;
-};
 
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
@@ -108,27 +91,31 @@ int main(int argc, char** argv) {
 	//std::string modelPath = (modelDir / "nanosuit/nanosuit.obj").string();
 
 	std::string resourcePath = "C:/Users/txp/source/repos/LearnOpengl/LearnOpengl/src";
-	std::string vertPath = resourcePath + "/shader/shader.vert";
-	std::string fragPath = resourcePath + "/shader/shader.frag";
-	std::string modelPath = resourcePath + "/assert/nanosuit/nanosuit.obj";
+	//std::string vertPath = resourcePath + "/shader/shader.vert";
+	//std::string fragPath = resourcePath + "/shader/shader.frag";
+	//std::string modelPath = resourcePath + "/assert/nanosuit/nanosuit.obj";
 
 	std::string axioPath = resourcePath + "/assert/axio/axio.obj";
 
-	spdlog::info("vertPath:{}", vertPath);
-	spdlog::info("fragPath:{}", fragPath);
-	spdlog::info("modelPath:{}", modelPath);
-	spdlog::info("AxioPath:{}", axioPath);
+	//spdlog::info("vertPath:{}", vertPath);
+	//spdlog::info("fragPath:{}", fragPath);
+	//spdlog::info("modelPath:{}", modelPath);
+	//spdlog::info("AxioPath:{}", axioPath);
 
-	Shader ourShader(vertPath, fragPath);
-	MMesh::Model ourModel(modelPath);
+	//Shader ourShader(vertPath, fragPath);
+	//MMesh::Model ourModel(modelPath);
+
+	BigManModel bigManModel;
+	
+	bigManModel.loadData();
 
 	//模型边缘绘制
 	std::string shaderSingleColorFragPath = resourcePath + "/shader/singleColor.frag";
 
 	// sun
-	vertPath = resourcePath + "/shader/sun.vert";
-	fragPath = resourcePath + "/shader/sun.frag";
-	modelPath = resourcePath + "/assert/sun/sun.obj";
+	std::string vertPath = resourcePath + "/shader/sun.vert";
+	std::string fragPath = resourcePath + "/shader/sun.frag";
+	std::string modelPath = resourcePath + "/assert/sun/sun.obj";
 
 	Shader sunShader(vertPath, fragPath);
 	MMesh::Model sunModel(modelPath);
@@ -298,7 +285,7 @@ int main(int argc, char** argv) {
 		glm::mat4 model = glm::mat4(1.0f);
 
 
-		ourShader.use();
+		/*ourShader.use();
 		ourShader.setMat4("view", view);
 		ourShader.setMat4("projection", projection);
 		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
@@ -309,11 +296,15 @@ int main(int argc, char** argv) {
 		ourShader.setVec3("viewPos", camera.Position);
 		ourShader.setFloat("light.constant", 1.0f);
 		ourShader.setFloat("light.linear", 0.09f);
-		ourShader.setFloat("light.quadratic", 0.032f);
+		ourShader.setFloat("light.quadratic", 0.032f);*/
+		bigManModel.setView(view);
+		bigManModel.setModel(model);
+		bigManModel.setProjection(projection);
+		bigManModel.setCamera(camera);
+		bigManModel.setLightMaterial(light_material);
+		bigManModel.setLightPosition(light_position);
 
-
-		ourModel.draw(ourShader);
-
+		bigManModel.draw();
 		// sun
 		sunShader.use();
 		sunShader.setMat4("view", view);

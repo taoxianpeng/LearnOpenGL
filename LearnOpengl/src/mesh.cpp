@@ -1,11 +1,7 @@
+#pragma once
+
 #include "mesh.h"
-
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-
-#include <spdlog/spdlog.h>
-#include <iostream>
-//#include <checkError.h>
+#include "common.h"
 
 using namespace MMesh;
 
@@ -41,16 +37,6 @@ static unsigned int TextureFromFile(std::string_view path) {
 	}
 	stbi_image_free(data);
 	return textureID;
-}
-
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,
-	std::vector<Texture> textures, Material mat) {
-	this->vertices = vertices;
-	this->indices = indices;
-	this->textures = textures;
-	this->mats = mat;
-
-	setupMesh();
 }
 
 void Mesh::draw(Shader& shader) {
