@@ -239,7 +239,8 @@ int main(int argc, char** argv) {
 	vertPath = resourcePath + "/shader/window.vert";
 	fragPath = resourcePath + "/shader/window.frag";
 	Shader quartShader(vertPath, fragPath);
-
+	
+	glEnable(GL_DEPTH_TEST);
 
 	while (!glfwWindowShouldClose(window)) {
 		
@@ -287,18 +288,6 @@ int main(int argc, char** argv) {
 		glm::mat4 model = glm::mat4(1.0f);
 
 
-		/*ourShader.use();
-		ourShader.setMat4("view", view);
-		ourShader.setMat4("projection", projection);
-		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
-		ourShader.setMat4("model", model);
-		ourShader.setVec3("light.position", light_position);
-		ourShader.setVec3("light.diffuse", light_material.diffuse);
-		ourShader.setVec3("viewPos", camera.Position);
-		ourShader.setFloat("light.constant", 1.0f);
-		ourShader.setFloat("light.linear", 0.09f);
-		ourShader.setFloat("light.quadratic", 0.032f);*/
 		bigManModel.setView(view);
 		bigManModel.setModel(model);
 		bigManModel.setProjection(projection);
