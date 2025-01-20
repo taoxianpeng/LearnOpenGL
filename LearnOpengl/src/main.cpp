@@ -1,14 +1,13 @@
 
 #include <iostream>
 #include <filesystem>
-
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <spdlog/spdlog.h>
 #include <checkError.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 
+#include "log.h"
 #include "camera.h"
 #include "common.h"
 #include "imgui.h"
@@ -56,6 +55,9 @@ void framebufferWindow(GLuint textureID) {
 }
 
 int main(int argc, char** argv) {
+
+	init_logger();
+
 	glfwSetErrorCallback(glfw_error_callback);
 	if (!glfwInit()) return 1;
 

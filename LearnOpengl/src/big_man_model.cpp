@@ -1,4 +1,5 @@
 #include "big_man_model.h"
+#include "log.h"
 
 void BigManModel::loadData()
 {
@@ -7,9 +8,9 @@ void BigManModel::loadData()
 	std::string fragPath = resourcePath + "/shader/shader.frag";
 	std::string modelPath = resourcePath + "/assert/nanosuit/nanosuit.obj";
 
-	spdlog::info("vertPath:{}", vertPath);
-	spdlog::info("fragPath:{}", fragPath);
-	spdlog::info("modelPath:{}", modelPath);
+	LOGI("vertPath:{}", vertPath);
+	LOGI("fragPath:{}", fragPath);
+	LOGI("modelPath:{}", modelPath);
 
 
 	m_shader = Shader(vertPath, fragPath);
@@ -31,7 +32,6 @@ void BigManModel::draw()
 	m_shader.setFloat("light.constant", 1.0f);
 	m_shader.setFloat("light.linear", 0.09f);
 	m_shader.setFloat("light.quadratic", 0.032f);
-
 
 	m_meshModel.draw(m_shader);
 }
