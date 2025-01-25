@@ -1,4 +1,5 @@
 #include "Shader.h"
+#include "log.h"
 
 #include <fstream>
 #include <iostream>
@@ -30,7 +31,7 @@ Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath) {
 
 	}
 	catch (std::ifstream::failure e) {
-		std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
+		LOGE("ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ");
 	}
 
 	const char* vShaderCode = vertexCode.c_str();
@@ -47,8 +48,7 @@ Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath) {
 	if (!success) {
 		// 获取编译信息，存储到字符数组中，然后打印出来
 		glGetShaderInfoLog(vertex, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::VERTEX::COMPLIATION_FAILED\n"
-			<< infoLog << std::endl;
+		LOGE("ERROR::SHADER::VERTEX::COMPLIATION_FAILED {}", infoLog);
 	}
 
 	fragment = glCreateShader(GL_FRAGMENT_SHADER);
@@ -57,8 +57,7 @@ Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath) {
 	glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
 	if (!success) {
 		glGetShaderInfoLog(fragment, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::FRAGMENT::COMPLIATION_FAILED\n"
-			<< infoLog << std::endl;
+		LOGE("ERROR::SHADER::FRAGMENT::COMPLIATION_FAILED {}", infoLog);
 	}
 
 	ID = glCreateProgram();
@@ -69,7 +68,7 @@ Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath) {
 	glGetProgramiv(ID, GL_LINK_STATUS, &success);
 	if (!success) {
 		glGetProgramInfoLog(ID, 512, NULL, infoLog);
-		std::cout << "ERROR::LinkProgram::LINK_FAILED " << infoLog << std::endl;
+		LOGE("ERROR::LinkProgram::LINK_FAILED {}", infoLog);
 	}
 
 	// 然后删除顶点着色器和片段着色器

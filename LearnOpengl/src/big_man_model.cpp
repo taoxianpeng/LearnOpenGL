@@ -1,12 +1,13 @@
 #include "big_man_model.h"
 #include "log.h"
+#include "direction.h"
 
 void BigManModel::loadData()
 {
-	std::string resourcePath = "C:/Users/txp/source/repos/LearnOpengl/LearnOpengl/src";
+	const std::string& resourcePath = Direction::getInstance()->getProjectRootPath();
 	std::string vertPath = resourcePath + "/shader/shader.vert";
 	std::string fragPath = resourcePath + "/shader/shader.frag";
-	std::string modelPath = resourcePath + "/assert/nanosuit/nanosuit.obj";
+	std::string modelPath = resourcePath + "/resource/nanosuit/nanosuit.obj";
 
 	LOGI("vertPath:{}", vertPath);
 	LOGI("fragPath:{}", fragPath);

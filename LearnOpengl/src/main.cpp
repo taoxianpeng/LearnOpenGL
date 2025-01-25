@@ -1,6 +1,5 @@
 
 #include <iostream>
-#include <filesystem>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <checkError.h>
@@ -15,6 +14,7 @@
 #include "imgui_impl_opengl3.h"
 #include "mesh.h"
 #include "texture.h"
+#include "direction.h"
 
 #include "big_man_model.h"
 
@@ -55,6 +55,8 @@ void framebufferWindow(GLuint textureID) {
 }
 
 int main(int argc, char** argv) {
+
+	Direction::getInstance()->loadConfig("/home/txp/Documents/LearnOpenGL/LearnOpengl/config.json");
 
 	init_logger();
 

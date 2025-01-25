@@ -10,12 +10,14 @@ project(LearnOpengl)
 # 设置 C++ 标准
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include_directories(
 	thirdParty/Common/glad/include
 	thirdParty/Common/glm
 	thirdParty/Common/imgui
 	thirdParty/Common/imgui/backends	
+	thirdParty/Common/nlohmann/single_include
 )
 
 if (CMAKE_SYSTEM_NAME MATCHES "Linux")
@@ -71,4 +73,6 @@ elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
 endif()
 
 target_link_libraries(${PROJECT_NAME} ${glfw} ${glew} ${assimp} ${wrapper} GL)
+
+file(COPY ${CMAKE_SOURCE_DIR}/config.json DESTINATION ${CMAKE_BINARY_DIR})
 # TODO: 如有需要，请添加测试并安装目标。
