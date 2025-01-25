@@ -1,11 +1,12 @@
-﻿# CMakeList.txt: LearnOpengl 的 CMake 项目，在此处包括源代码并定义
-# 项目特定的逻辑。
-#
-# 指定 CMake 的最低版本
-cmake_minimum_required(VERSION 3.14)
+﻿cmake_minimum_required(VERSION 3.14)
 
 # 指定项目名称
 project(LearnOpengl)
+
+# 设置默认构建类型为 Debug（如果未指定）
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Debug)
+endif()
 
 # 设置 C++ 标准
 set(CMAKE_CXX_STANDARD 20)
@@ -18,6 +19,8 @@ include_directories(
 	thirdParty/Common/imgui
 	thirdParty/Common/imgui/backends	
 	thirdParty/Common/nlohmann/single_include
+
+	src
 )
 
 if (CMAKE_SYSTEM_NAME MATCHES "Linux")

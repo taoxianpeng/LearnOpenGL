@@ -2,6 +2,7 @@
 
 #include "mesh.h"
 #include "common.h"
+#include "log.h"
 
 using namespace MMesh;
 
@@ -146,6 +147,7 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 		vector.z = mesh->mVertices[i].z;
 
 		vertex.position = vector;
+		LOGD("vertex position {} {} {}", vector.x, vector.y, vector.z);
 
 		if (mesh->HasNormals()) {
 			// 处理法线信息
@@ -181,6 +183,7 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 
 		vertices.emplace_back(vertex);
 	}
+	LOGI("Mesh vertices size: {}", vertices.size());
 	//spdlog::info("vertices Texture:{}")
 
 	// 处理索引

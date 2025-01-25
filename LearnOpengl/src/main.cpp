@@ -1,14 +1,13 @@
 
-#include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <checkError.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 
+#include "common.h"
 #include "log.h"
 #include "camera.h"
-#include "common.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -17,6 +16,7 @@
 #include "direction.h"
 
 #include "big_man_model.h"
+#include "axio_model.h"
 
 using namespace std;
 
@@ -56,7 +56,7 @@ void framebufferWindow(GLuint textureID) {
 
 int main(int argc, char** argv) {
 
-	Direction::getInstance()->loadConfig("/home/txp/Documents/LearnOpenGL/LearnOpengl/config.json");
+	Direction::getInstance()->loadConfig("config.json");
 
 	init_logger();
 
@@ -85,98 +85,71 @@ int main(int argc, char** argv) {
 	gladLoadGL();
 	glfwSwapInterval(1);  // Enable vsync
 
-	//std::filesystem::path shaderDir =
-	//	filesystem::path("C:\\Users\\txp\\source\\repos\\LearnOpengl\\LearnOpengl\\src") / "shader";
-	//std::filesystem::path modelDir =
-	//	filesystem::path("C:\\Users\\txp\\source\\repos\\LearnOpengl\\LearnOpengl\\src") / "assert";
-
-	//std::string vertPath = (shaderDir / "shader.vert").string();
-	//std::string fragPath = (shaderDir / "shader.frag").string();
-	//std::string modelPath = (modelDir / "nanosuit/nanosuit.obj").string();
-
-	std::string resourcePath = "C:/Users/txp/source/repos/LearnOpengl/LearnOpengl/src";
-	//std::string vertPath = resourcePath + "/shader/shader.vert";
-	//std::string fragPath = resourcePath + "/shader/shader.frag";
-	//std::string modelPath = resourcePath + "/assert/nanosuit/nanosuit.obj";
-
-	std::string axioPath = resourcePath + "/assert/axio/axio.obj";
-
-	//spdlog::info("vertPath:{}", vertPath);
-	//spdlog::info("fragPath:{}", fragPath);
-	//spdlog::info("modelPath:{}", modelPath);
-	//spdlog::info("AxioPath:{}", axioPath);
-
-	//Shader ourShader(vertPath, fragPath);
-	//MMesh::Model ourModel(modelPath);
-
-	BigManModel bigManModel;
-	
+	BigManModel bigManModel;	
 	bigManModel.loadData();
 
-	//模型边缘绘制
-	std::string shaderSingleColorFragPath = resourcePath + "/shader/singleColor.frag";
+	// //模型边缘绘制
+	// std::string shaderSingleColorFragPath = resourcePath + "/shader/singleColor.frag";
 
-	// sun
-	std::string vertPath = resourcePath + "/shader/sun.vert";
-	std::string fragPath = resourcePath + "/shader/sun.frag";
-	std::string modelPath = resourcePath + "/assert/sun/sun.obj";
+	// // sun
+	// std::string vertPath = resourcePath + "/shader/sun.vert";
+	// std::string fragPath = resourcePath + "/shader/sun.frag";
+	// std::string modelPath = resourcePath + "/assert/sun/sun.obj";
 
-	Shader sunShader(vertPath, fragPath);
-	MMesh::Model sunModel(modelPath);
+	// Shader sunShader(vertPath, fragPath);
+	// MMesh::Model sunModel(modelPath);
 
-	Shader singleColorShader(vertPath, shaderSingleColorFragPath);
+	// Shader singleColorShader(vertPath, shaderSingleColorFragPath);
 
 	// axio
-	vertPath = resourcePath + "/shader/axio.vert";
-	fragPath = resourcePath + "/shader/axio.frag";
-	Shader axioShader(vertPath, fragPath);
-	MMesh::Model axioModel(axioPath);
+	AxioModel axioModel;
+	axioModel.loadData();
 
 
 	/* 构建窗户 Start */
-	float verties[] = {
-		-0.5f, -0.5, 0.0f, 0.0f, 0.0f,
-		0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-		0.5f, 0.5f, 0.0f, 1.0f, 1.0f,
-		-0.5f, 0.5f, 0.0f, 0.0f, 1.0f
-	};
+	// float verties[] = {
+	// 	-0.5f, -0.5, 0.0f, 0.0f, 0.0f,
+	// 	0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+	// 	0.5f, 0.5f, 0.0f, 1.0f, 1.0f,
+	// 	-0.5f, 0.5f, 0.0f, 0.0f, 1.0f
+	// };
 
-	unsigned int indices[] = {
-		0, 1, 3,
-		1, 2, 3
-	};
+	// unsigned int indices[] = {
+	// 	0, 1, 3,
+	// 	1, 2, 3
+	// };
 
-	std::vector<glm::vec3> windows
-	{
-		glm::vec3(-1.5f, 0.0f, -0.48f),
-		glm::vec3(1.5f, 0.0f, 0.51f),
-		glm::vec3(0.0f, 0.0f, 0.7f),
-		glm::vec3(-0.3f, 0.0f, -2.3f),
-		glm::vec3(0.5f, 0.0f, -0.6f)
-	};
+	// std::vector<glm::vec3> windows
+	// {
+	// 	glm::vec3(-1.5f, 0.0f, -0.48f),
+	// 	glm::vec3(1.5f, 0.0f, 0.51f),
+	// 	glm::vec3(0.0f, 0.0f, 0.7f),
+	// 	glm::vec3(-0.3f, 0.0f, -2.3f),
+	// 	glm::vec3(0.5f, 0.0f, -0.6f)
+	// };
 
 
-	GLuint VAO = 0, VBO = 0, EBO = 0;
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &EBO);
+	// GLuint VAO = 0, VBO = 0, EBO = 0;
+	// glGenVertexArrays(1, &VAO);
+	// glGenBuffers(1, &VBO);
+	// glGenBuffers(1, &EBO);
 
-	glBindVertexArray(VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(verties), verties, GL_STATIC_DRAW);
+	// glBindVertexArray(VAO);
+	// glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	// glBufferData(GL_ARRAY_BUFFER, sizeof(verties), verties, GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	// glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	// glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(0));
-	glEnableVertexAttribArray(0);
+	// glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(0));
+	// glEnableVertexAttribArray(0);
 
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
+	// glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	// glEnableVertexAttribArray(1);
 
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-	/* 构建窗户 End */
+	// glBindBuffer(GL_ARRAY_BUFFER, 0);
+	// glBindVertexArray(0);
+	// /* 构建窗户 End */
 
 
 
@@ -235,12 +208,12 @@ int main(int argc, char** argv) {
 	static glm::vec3 light_position = glm::vec3(1.0f, 1.0f, 1.0f);
 
 	// 加载纹理
-	Texture quartTex;
+	// Texture quartTex;
 
-	quartTex.create("C:\\Users\\txp\\source\\repos\\LearnOpengl\\LearnOpengl\\src\\assert\\blending_transparent_window.PNG");
-	vertPath = resourcePath + "/shader/window.vert";
-	fragPath = resourcePath + "/shader/window.frag";
-	Shader quartShader(vertPath, fragPath);
+	// quartTex.create("C:\\Users\\txp\\source\\repos\\LearnOpengl\\LearnOpengl\\src\\assert\\blending_transparent_window.PNG");
+	// vertPath = resourcePath + "/shader/window.vert";
+	// fragPath = resourcePath + "/shader/window.frag";
+	// Shader quartShader(vertPath, fragPath);
 	
 	glEnable(GL_DEPTH_TEST);
 
@@ -298,33 +271,39 @@ int main(int argc, char** argv) {
 		bigManModel.setLightPosition(light_position);
 
 		bigManModel.draw();
-		// sun
-		sunShader.use();
-		sunShader.setMat4("view", view);
-		sunShader.setMat4("projection", projection);
-		model = glm::translate(model, light_position);
-		sunShader.setMat4("model", model);
+		// // sun
+		// sunShader.use();
+		// sunShader.setMat4("view", view);
+		// sunShader.setMat4("projection", projection);
+		// model = glm::translate(model, light_position);
+		// sunShader.setMat4("model", model);
 
-		sunModel.draw(sunShader);
+		// sunModel.draw(sunShader);
 
-		float scale = 1.1f;
-		singleColorShader.use();
-		singleColorShader.setMat4("view", view);
-		singleColorShader.setMat4("projection", projection);
-		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(scale, scale, scale));
-		singleColorShader.setMat4("model", model);
+		// float scale = 1.1f;
+		// singleColorShader.use();
+		// singleColorShader.setMat4("view", view);
+		// singleColorShader.setMat4("projection", projection);
+		// model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+		// model = glm::scale(model, glm::vec3(scale, scale, scale));
+		// singleColorShader.setMat4("model", model);
 
-		sunModel.draw(singleColorShader);
+		// sunModel.draw(singleColorShader);
+
+		axioModel.setCamera(camera);
+		axioModel.setModel(model);
+		axioModel.setProjection(projection);
+		axioModel.setView(view);
+		axioModel.draw();
 
 		// axio
-		axioShader.use();
-		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
-		axioShader.setMat4("view", view);
-		axioShader.setMat4("projection", projection);
-		axioShader.setMat4("model", model);
-		axioModel.draw(axioShader);
+		// axioShader.use();
+		// model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+		// model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+		// axioShader.setMat4("view", view);
+		// axioShader.setMat4("projection", projection);
+		// axioShader.setMat4("model", model);
+		// axioModel.draw(axioShader);
 
 
 		glBindVertexArray(0);
@@ -387,8 +366,8 @@ int main(int argc, char** argv) {
 
 	}
 
-	glDeleteBuffers(1, &VBO);
-	glDeleteBuffers(1, &EBO);
+	// glDeleteBuffers(1, &VBO);
+	// glDeleteBuffers(1, &EBO);
 	// Cleanup
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
