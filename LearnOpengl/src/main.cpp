@@ -17,6 +17,7 @@
 
 #include "big_man_model.h"
 #include "axio_model.h"
+#include "window_model.h"
 
 using namespace std;
 
@@ -105,6 +106,8 @@ int main(int argc, char** argv) {
 	AxioModel axioModel;
 	axioModel.loadData();
 
+	WindowModel windowModel;
+	windowModel.loadData();
 
 	/* 构建窗户 Start */
 	// float verties[] = {
@@ -160,10 +163,10 @@ int main(int argc, char** argv) {
 	//glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, SCR_WIDTH, SCR_HEIGHT); // use a single renderbuffer object for both a depth AND stencil buffer.
 	//glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo); // now actually attach it
 
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		spdlog::error("ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
+	// if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+	// 	spdlog::error("ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	// glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	// 帧缓冲 End
 
@@ -296,6 +299,12 @@ int main(int argc, char** argv) {
 		axioModel.setView(view);
 		axioModel.draw();
 
+		windowModel.setCamera(camera);
+		windowModel.setModel(model);
+		windowModel.setProjection(projection);
+		windowModel.setView(view);
+		windowModel.draw();
+
 		// axio
 		// axioShader.use();
 		// model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
@@ -306,7 +315,6 @@ int main(int argc, char** argv) {
 		// axioModel.draw(axioShader);
 
 
-		glBindVertexArray(0);
 		// 2. Show a simple window that we create ourselves. We use a Begin/End pair
 		// to create a named window.
 		{
