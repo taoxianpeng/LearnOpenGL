@@ -4,7 +4,7 @@
 
 void AxioModel::loadData()
 {
-	const std::string& resourcePath = Direction::getInstance()->getProjectRootPath();
+	const std::string resourcePath = Direction::getInstance()->getProjectRootPath().string();
 	std::string vertPath = resourcePath + "/shader/axio.vert";;
 	std::string fragPath = resourcePath + "/shader/axio.frag";
 	std::string modelPath = resourcePath + "/resource/axio/axio.obj";

@@ -8,7 +8,7 @@ using namespace MMesh;
 
 static unsigned int TextureFromFile(std::string_view path) {
 	unsigned int textureID;
-	glGenTextures(1, &textureID);
+	CheckCall(glGenTextures(1, &textureID));
 	int texWidth, texHeight, texChannal;
 
 	unsigned char* data =
@@ -22,19 +22,19 @@ static unsigned int TextureFromFile(std::string_view path) {
 		else if (texChannal == 4)
 			format = GL_RGBA;
 
-		glBindTexture(GL_TEXTURE_2D, textureID);
-		glTexImage2D(GL_TEXTURE_2D, 0, format, texWidth, texHeight, 0, format,
-			GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
+		CheckCall(glBindTexture(GL_TEXTURE_2D, textureID));
+		CheckCall(glTexImage2D(GL_TEXTURE_2D, 0, format, texWidth, texHeight, 0, format,
+			GL_UNSIGNED_BYTE, data));
+		CheckCall(glGenerateMipmap(GL_TEXTURE_2D));
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-			GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		CheckCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));
+		CheckCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT));
+		CheckCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+			GL_LINEAR_MIPMAP_LINEAR));
+		CheckCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
 	}
 	else {
-		spdlog::error("Texture failed to load at path: {}", path);
+		LOGE("Texture failed to load at path: {}", path);
 	}
 	stbi_image_free(data);
 	return textureID;
@@ -44,7 +44,7 @@ void Mesh::draw(Shader& shader) {
 	unsigned int diffuseNr = 1;
 	unsigned int specularNr = 1;
 	for (auto i = 0; i < textures.size(); i++) {
-		glActiveTexture(GL_TEXTURE0 + i);
+		CheckCall(glActiveTexture(GL_TEXTURE0 + i));
 		std::string number;
 		std::string name = textures[i].type;
 
@@ -54,49 +54,49 @@ void Mesh::draw(Shader& shader) {
 			number = std::to_string(specularNr++);
 
 		shader.setInt(("material." + name + number).c_str(), i);
-		glBindTexture(GL_TEXTURE_2D, textures[i].id);
+		CheckCall(glBindTexture(GL_TEXTURE_2D, textures[i].id));
 	}
-	glActiveTexture(GL_TEXTURE0);
+	CheckCall(glActiveTexture(GL_TEXTURE0));
 
 	//spdlog::info("******* mesh color:{},{},{}", mats.Kd.r, mats.Kd.g, mats.Kd.b);
-	glBindVertexArray(VAO);
-	glBindBufferRange(GL_UNIFORM_BUFFER, 0, uniformBlockIndex, 0, sizeof(Material));
-	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-	glBindVertexArray(0);
+	CheckCall(glBindVertexArray(VAO));
+	CheckCall(glBindBufferRange(GL_UNIFORM_BUFFER, 0, uniformBlockIndex, 0, sizeof(Material)));
+	CheckCall(glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0));
+	CheckCall(glBindVertexArray(0));
 }
 
 void Mesh::setupMesh() {
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &EBO);
-	glGenBuffers(1, &uniformBlockIndex);
+	CheckCall(glGenVertexArrays(1, &VAO));
+	CheckCall(glGenBuffers(1, &VBO));
+	CheckCall(glGenBuffers(1, &EBO));
+	CheckCall(glGenBuffers(1, &uniformBlockIndex));
 
-	glBindVertexArray(VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0],
-		GL_STATIC_DRAW);
+	CheckCall(glBindVertexArray(VAO));
+	CheckCall(glBindBuffer(GL_ARRAY_BUFFER, VBO));
+	CheckCall(glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0],
+		GL_STATIC_DRAW));
 
-	glBindBuffer(GL_UNIFORM_BUFFER, uniformBlockIndex);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(mats), (void*)(&mats), GL_STATIC_DRAW);
+	CheckCall(glBindBuffer(GL_UNIFORM_BUFFER, uniformBlockIndex));
+	CheckCall(glBufferData(GL_UNIFORM_BUFFER, sizeof(mats), (void*)(&mats), GL_STATIC_DRAW));
 
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int),
-		&indices[0], GL_STATIC_DRAW);
+	CheckCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO));
+	CheckCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int),
+		&indices[0], GL_STATIC_DRAW));
 
 	// 顶点位置
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+	CheckCall(glEnableVertexAttribArray(0));
+	CheckCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0));
 	// 法线位置
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-		(void*)(offsetof(Vertex, normal)));
+	CheckCall(glEnableVertexAttribArray(1));
+	CheckCall(glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+		(void*)(offsetof(Vertex, normal))));
 	// 顶点纹理坐标
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-		(void*)(offsetof(Vertex, texCoords)));
+	CheckCall(glEnableVertexAttribArray(2));
+	CheckCall(glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+		(void*)(offsetof(Vertex, texCoords))));
 
-	glBindVertexArray(0);
+	CheckCall(glBindVertexArray(0));
 }
 
 void Model::draw(Shader& shader) {
@@ -147,7 +147,7 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 		vector.z = mesh->mVertices[i].z;
 
 		vertex.position = vector;
-		LOGD("vertex position {} {} {}", vector.x, vector.y, vector.z);
+		// LOGD("vertex position {} {} {}", vector.x, vector.y, vector.z);
 
 		if (mesh->HasNormals()) {
 			// 处理法线信息
@@ -241,7 +241,7 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat,
 		mat->GetTexture(type, i, &aiStr);
 
 		std::string path = std::string(this->directory + "/" + aiStr.C_Str());
-		spdlog::info("Load Resource path: {}", path);
+		LOGI("Load Resource path: {}", path);
 
 		auto it = std::find_if(
 			texture_loaded.cbegin(), texture_loaded.cend(),
@@ -256,7 +256,7 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat,
 			texture.type = typeName;
 			textures.emplace_back(texture);
 			texture_loaded.emplace_back(texture);
-			spdlog::info("id:{}, type:{}", texture.id, texture.type);
+			LOGI("id:{}, type:{}", texture.id, texture.type);
 		}
 	}
 	return textures;

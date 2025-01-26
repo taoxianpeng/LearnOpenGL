@@ -3,3 +3,4 @@ build
 .vs
 .vscode/settings.json
 .cache
+build_vs2022

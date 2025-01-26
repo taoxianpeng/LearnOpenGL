@@ -16,3 +16,12 @@ inline void init_logger() {
 #define LOGD(...) spdlog::debug("{}:{} [{}] {}", get_filename(__FILE__), __LINE__, __FUNCTION__, fmt::format(__VA_ARGS__))
 #define LOGE(...) spdlog::error("{}:{} [{}] {}", get_filename(__FILE__), __LINE__, __FUNCTION__, fmt::format(__VA_ARGS__))
 #define LOGI(...) spdlog::info("{}:{} [{}] {}", get_filename(__FILE__), __LINE__, __FUNCTION__, fmt::format(__VA_ARGS__))
+
+#define CheckCall(func) \
+    func; \
+    { \
+        GLenum err = glGetError(); \
+        if (err != GL_NO_ERROR) { \
+            spdlog::error("{}:{} [{}] OpenGL Error:{}", get_filename(__FILE__), __LINE__, __FUNCTION__, err); \
+        } \
+    }

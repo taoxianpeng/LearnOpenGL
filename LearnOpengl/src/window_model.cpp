@@ -27,28 +27,28 @@ void WindowModel::loadData() {
 		glm::vec3(0.5f, 0.0f, -0.6f)
 	};
 
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &EBO);
+	CheckCall(glGenVertexArrays(1, &VAO));
+	CheckCall(glGenBuffers(1, &VBO));
+	CheckCall(glGenBuffers(1, &EBO));
 
-	glBindVertexArray(VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(verties), verties, GL_STATIC_DRAW);
+	CheckCall(glBindVertexArray(VAO));
+	CheckCall(glBindBuffer(GL_ARRAY_BUFFER, VBO));
+	CheckCall(glBufferData(GL_ARRAY_BUFFER, sizeof(verties), verties, GL_STATIC_DRAW));
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	CheckCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO));
+	CheckCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW));
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(0));
-	glEnableVertexAttribArray(0);
+	CheckCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(0)));
+	CheckCall(glEnableVertexAttribArray(0));
 
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
+	CheckCall(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float))));
+	CheckCall(glEnableVertexAttribArray(1));
 
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
+	CheckCall(glBindBuffer(GL_ARRAY_BUFFER, 0));
+	CheckCall(glBindVertexArray(0));
 	/* 构建窗户 End */
 
-	const std::string& resourcePath = Direction::getInstance()->getProjectRootPath();
+	const std::string resourcePath = Direction::getInstance()->getProjectRootPath().string();
 	std::string vertPath = resourcePath + "/shader/window.vert";
 	std::string fragPath = resourcePath + "/shader/window.frag";
 
@@ -57,7 +57,7 @@ void WindowModel::loadData() {
 
 
 	m_shader = Shader(vertPath, fragPath);
-    
+    LOGD("m_shader.ID: {}", m_shader.ID);
 }
 
 void WindowModel::draw() {
@@ -68,8 +68,9 @@ void WindowModel::draw() {
 	m_model = glm::scale(m_model, glm::vec3(1.0f, 1.0f, 1.0f));
 	m_shader.setMat4("model", m_model);
 
-    glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+	LOGD("VAO: {}", VAO);
+    CheckCall(glBindVertexArray(VAO));
+    CheckCall(glDrawArrays(GL_TRIANGLES, 0, 6));
 
-    glBindVertexArray(0);
+    CheckCall(glBindVertexArray(0));
 }

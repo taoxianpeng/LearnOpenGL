@@ -2,6 +2,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <checkError.h>
+#include <iostream>
 
 #define STB_IMAGE_IMPLEMENTATION
 
@@ -18,9 +19,9 @@
 #include "big_man_model.h"
 #include "axio_model.h"
 #include "window_model.h"
+#include "triangle_model.h"
 
 using namespace std;
-
 
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
@@ -89,19 +90,6 @@ int main(int argc, char** argv) {
 	BigManModel bigManModel;	
 	bigManModel.loadData();
 
-	// //模型边缘绘制
-	// std::string shaderSingleColorFragPath = resourcePath + "/shader/singleColor.frag";
-
-	// // sun
-	// std::string vertPath = resourcePath + "/shader/sun.vert";
-	// std::string fragPath = resourcePath + "/shader/sun.frag";
-	// std::string modelPath = resourcePath + "/assert/sun/sun.obj";
-
-	// Shader sunShader(vertPath, fragPath);
-	// MMesh::Model sunModel(modelPath);
-
-	// Shader singleColorShader(vertPath, shaderSingleColorFragPath);
-
 	// axio
 	AxioModel axioModel;
 	axioModel.loadData();
@@ -109,6 +97,8 @@ int main(int argc, char** argv) {
 	WindowModel windowModel;
 	windowModel.loadData();
 
+	TriangleModel triangleModel;	
+	triangleModel.loadData();
 	/* 构建窗户 Start */
 	// float verties[] = {
 	// 	-0.5f, -0.5, 0.0f, 0.0f, 0.0f,
@@ -217,8 +207,9 @@ int main(int argc, char** argv) {
 	// vertPath = resourcePath + "/shader/window.vert";
 	// fragPath = resourcePath + "/shader/window.frag";
 	// Shader quartShader(vertPath, fragPath);
-	
-	glEnable(GL_DEPTH_TEST);
+
+
+	CheckCall(glEnable(GL_DEPTH_TEST));
 
 	while (!glfwWindowShouldClose(window)) {
 		
@@ -249,12 +240,12 @@ int main(int argc, char** argv) {
 		}
 
 		// Rendering
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glClear(
+		CheckCall(glClearColor(0.2f, 0.3f, 0.3f, 1.0f));
+		CheckCall(glClear(
 			GL_COLOR_BUFFER_BIT |
 			GL_DEPTH_BUFFER_BIT |
 			GL_STENCIL_BUFFER_BIT
-		);
+		));
 
 
 		// create transformations
@@ -265,7 +256,6 @@ int main(int argc, char** argv) {
 			100.0f);
 		glm::mat4 model = glm::mat4(1.0f);
 
-
 		bigManModel.setView(view);
 		bigManModel.setModel(model);
 		bigManModel.setProjection(projection);
@@ -273,7 +263,7 @@ int main(int argc, char** argv) {
 		bigManModel.setLightMaterial(light_material);
 		bigManModel.setLightPosition(light_position);
 
-		bigManModel.draw();
+		// bigManModel.draw();
 		// // sun
 		// sunShader.use();
 		// sunShader.setMat4("view", view);
@@ -293,17 +283,19 @@ int main(int argc, char** argv) {
 
 		// sunModel.draw(singleColorShader);
 
-		axioModel.setCamera(camera);
-		axioModel.setModel(model);
-		axioModel.setProjection(projection);
-		axioModel.setView(view);
-		axioModel.draw();
+		// axioModel.setCamera(camera);
+		// axioModel.setModel(model);
+		// axioModel.setProjection(projection);
+		// axioModel.setView(view);
+		// axioModel.draw();
 
-		windowModel.setCamera(camera);
-		windowModel.setModel(model);
-		windowModel.setProjection(projection);
-		windowModel.setView(view);
-		windowModel.draw();
+		// windowModel.setCamera(camera);
+		// windowModel.setModel(model);
+		// windowModel.setProjection(projection);
+		// windowModel.setView(view);
+		// windowModel.draw();
+
+		triangleModel.draw();
 
 		// axio
 		// axioShader.use();
@@ -354,7 +346,7 @@ int main(int argc, char** argv) {
 				camera.Position.z);
 
 			ImGui::End();
-		}
+		}	
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -362,19 +354,10 @@ int main(int argc, char** argv) {
 		// Render
 		glfwSwapBuffers(window);
 
-		// 解除绑定
-		glBindVertexArray(0);
-		//glBindBuffer(1, 0);
-
-#ifdef _DEBUG
-		if (0 != glGetError()) {
-			spdlog::error("test error: {}", glGetError());
-		}
-#endif // DEBUG
-
+		// // 解除绑定
+		// CheckCall(glBindVertexArray(0));
 	}
 
-	// glDeleteBuffers(1, &VBO);
 	// glDeleteBuffers(1, &EBO);
 	// Cleanup
 	ImGui_ImplOpenGL3_Shutdown();
@@ -451,14 +434,14 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
 unsigned int loadCubeMap(const vector<string>& faces)
 {
 	GLuint textureID;
-	glGenTextures(1, &textureID);
-	glBindBuffer(GL_TEXTURE_CUBE_MAP, textureID);
+	CheckCall(glGenTextures(1, &textureID));
+	CheckCall(glBindBuffer(GL_TEXTURE_CUBE_MAP, textureID));
 
 	int width, height, nrChannels;
 	for (auto i = 0; i < faces.size(); ++i) {
 		unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
 		if (data) {
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, static_cast<void*>(data));
+			CheckCall(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, static_cast<void*>(data)));
 		}
 		else {
 			spdlog::error("Cubmap texture failed to load at path:{}", faces[i]);
@@ -466,11 +449,11 @@ unsigned int loadCubeMap(const vector<string>& faces)
 		stbi_image_free(data);
 	}
 
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	CheckCall(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+	CheckCall(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+	CheckCall(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+	CheckCall(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE));
+	CheckCall(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
 
 	return textureID;
 

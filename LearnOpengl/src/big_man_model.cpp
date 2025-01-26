@@ -4,7 +4,7 @@
 
 void BigManModel::loadData()
 {
-	const std::string& resourcePath = Direction::getInstance()->getProjectRootPath();
+	const std::string resourcePath = Direction::getInstance()->getProjectRootPath().string();
 	std::string vertPath = resourcePath + "/shader/shader.vert";
 	std::string fragPath = resourcePath + "/shader/shader.frag";
 	std::string modelPath = resourcePath + "/resource/nanosuit/nanosuit.obj";

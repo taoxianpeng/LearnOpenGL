@@ -23,7 +23,7 @@ include_directories(
 	src
 )
 
-if (CMAKE_SYSTEM_NAME MATCHES "Linux")
+if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	message(STATUS "当前平台: Linux, set include")
 	include_directories(
 		thirdParty/Linux/glfw/include
@@ -32,7 +32,7 @@ if (CMAKE_SYSTEM_NAME MATCHES "Linux")
 		thirdParty/Linux/spdlog/include
 		wrapper
 	)
-elseif (CMAKE_SYSTEM_NAME MATCHES "Windows")
+elseif (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	include_directories(
 		thirdParty/Win64/glfw/include
 		thirdParty/Win64/glew/include
@@ -51,7 +51,7 @@ add_subdirectory(wrapper)
 file(GLOB SRC_FILES src/*.cpp src/*.c src/*.h)
 add_executable (${PROJECT_NAME} ${SRC_FILES} ${IMGUI_FILES})
 		
-if (CMAKE_SYSTEM_NAME MATCHES "Linux")
+if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	target_link_directories(${PROJECT_NAME} PRIVATE 
 		thirdParty/Linux/glfw/src 
 		thirdParty/Linux/glew/lib
@@ -62,7 +62,10 @@ if (CMAKE_SYSTEM_NAME MATCHES "Linux")
 	set(glew GLEW)
 	set(assimp assimp)
 	set(wrapper wrapper)
-elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
+
+	target_link_libraries(${PROJECT_NAME} ${glfw} ${glew} ${assimp} ${wrapper} GL)
+
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	target_link_directories(${PROJECT_NAME} PRIVATE 
 		thirdParty/Win64/glfw/lib 
 		thirdParty/Win64/glew/lib
@@ -70,12 +73,12 @@ elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
 	)
 
 	set(glfw glfw3)
-	set(glew glfw32)
+	set(glew glew32)
 	set(assimp assimp-vc143-mt)
 	set(wrapper wrapper)
-endif()
 
-target_link_libraries(${PROJECT_NAME} ${glfw} ${glew} ${assimp} ${wrapper} GL)
+	target_link_libraries(${PROJECT_NAME} opengl32 ${glfw} ${glew} ${assimp} ${wrapper})
+endif()
 
 file(COPY ${CMAKE_SOURCE_DIR}/config.json DESTINATION ${CMAKE_BINARY_DIR})
 # TODO: 如有需要，请添加测试并安装目标。
