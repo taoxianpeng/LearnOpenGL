@@ -37,60 +37,60 @@ Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath) {
 	const char* vShaderCode = vertexCode.c_str();
 	const char* fShaderCode = fragmentCode.c_str();
 
-	unsigned int vertex, fragment;
+	unsigned int vertexShader, fragmentShader;
 	int success;
 	char infoLog[512];
 
-	vertex = glCreateShader(GL_VERTEX_SHADER);
-	CheckCall(glShaderSource(vertex, 1, &vShaderCode, NULL));
-	CheckCall(glCompileShader(vertex));
-	CheckCall(glGetShaderiv(vertex, GL_COMPILE_STATUS, &success));
+	vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	CheckCall(glShaderSource(vertexShader, 1, &vShaderCode, NULL));
+	CheckCall(glCompileShader(vertexShader));
+	CheckCall(glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success));
 	if (!success) {
 		// 获取编译信息，存储到字符数组中，然后打印出来
-		CheckCall(glGetShaderInfoLog(vertex, 512, NULL, infoLog));
+		CheckCall(glGetShaderInfoLog(vertexShader, 512, NULL, infoLog));
 		LOGE("ERROR::SHADER::VERTEX::COMPLIATION_FAILED {}", infoLog);
 	}
 
-	fragment = glCreateShader(GL_FRAGMENT_SHADER);
-	CheckCall(glShaderSource(fragment, 1, &fShaderCode, NULL));
-	CheckCall(glCompileShader(fragment));
-	CheckCall(glGetShaderiv(fragment, GL_COMPILE_STATUS, &success));
+	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	CheckCall(glShaderSource(fragmentShader, 1, &fShaderCode, NULL));
+	CheckCall(glCompileShader(fragmentShader));
+	CheckCall(glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success));
 	if (!success) {
-		CheckCall(glGetShaderInfoLog(fragment, 512, NULL, infoLog));
+		CheckCall(glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog));
 		LOGE("ERROR::SHADER::FRAGMENT::COMPLIATION_FAILED {}", infoLog);
 	}
 
-	ID = glCreateProgram();
-	CheckCall(glAttachShader(ID, vertex));
-	CheckCall(glAttachShader(ID, fragment));
-	CheckCall(glLinkProgram(ID));
+	shaderProgram = glCreateProgram();
+	CheckCall(glAttachShader(shaderProgram, vertexShader));
+	CheckCall(glAttachShader(shaderProgram, fragmentShader));
+	CheckCall(glLinkProgram(shaderProgram));
 
-	CheckCall(glGetProgramiv(ID, GL_LINK_STATUS, &success));
+	CheckCall(glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success));
 	if (!success) {
-		CheckCall(glGetProgramInfoLog(ID, 512, NULL, infoLog));
+		CheckCall(glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog));
 		LOGE("ERROR::LinkProgram::LINK_FAILED {}", infoLog);
 	}
 
 	// 然后删除顶点着色器和片段着色器
-	CheckCall(glDeleteShader(vertex));
-	CheckCall(glDeleteShader(fragment));
+	CheckCall(glDeleteShader(vertexShader));
+	CheckCall(glDeleteShader(fragmentShader));
 }
 
 void Shader::use() { 
-	CheckCall(glUseProgram(ID)); 
-	LOGD("Shader use ID: {}", ID);
+	CheckCall(glUseProgram(shaderProgram)); 
+	LOGD("Shader use ID: {}", shaderProgram);
 }
 
 void Shader::setBool(const std::string& name, bool value) const {
-	CheckCall(glUniform1i(glGetUniformLocation(ID, name.c_str()), (int)value));
+	CheckCall(glUniform1i(glGetUniformLocation(shaderProgram, name.c_str()), (int)value));
 }
 
 void Shader::setInt(const std::string& name, int value) const {
-	CheckCall(glUniform1i(glGetUniformLocation(ID, name.c_str()), value));
+	CheckCall(glUniform1i(glGetUniformLocation(shaderProgram, name.c_str()), value));
 }
 
 void Shader::setFloat(const std::string& name, float value) const {
-	CheckCall(glUniform1f(glGetUniformLocation(ID, name.c_str()), value));
+	CheckCall(glUniform1f(glGetUniformLocation(shaderProgram, name.c_str()), value));
 }
 
-Shader::~Shader() { CheckCall(glDeleteProgram(ID)); }
+Shader::~Shader() { CheckCall(glDeleteProgram(shaderProgram)); }

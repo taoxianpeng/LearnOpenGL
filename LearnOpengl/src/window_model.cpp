@@ -57,7 +57,7 @@ void WindowModel::loadData() {
 
 
 	m_shader = Shader(vertPath, fragPath);
-    LOGD("m_shader.ID: {}", m_shader.ID);
+    LOGD("m_shader.ID: {}", m_shader.shaderProgram);
 }
 
 void WindowModel::draw() {

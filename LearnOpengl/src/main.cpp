@@ -263,7 +263,7 @@ int main(int argc, char** argv) {
 		bigManModel.setLightMaterial(light_material);
 		bigManModel.setLightPosition(light_position);
 
-		// bigManModel.draw();
+		bigManModel.draw();
 		// // sun
 		// sunShader.use();
 		// sunShader.setMat4("view", view);
