@@ -16,7 +16,6 @@ void BigManModel::loadData()
 
 	m_shader = Shader(vertPath, fragPath);
 	m_meshModel = MMesh::Model(modelPath);
-
 }
 
 void BigManModel::draw()

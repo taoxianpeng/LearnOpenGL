@@ -57,20 +57,17 @@ void WindowModel::loadData() {
 
 
 	m_shader = Shader(vertPath, fragPath);
-    LOGD("m_shader.ID: {}", m_shader.shaderProgram);
 }
 
 void WindowModel::draw() {
-    m_shader.use();
+  m_shader.use();
 	m_shader.setMat4("view", m_view);
 	m_shader.setMat4("projection", m_projection);
 	m_model = glm::translate(m_model, glm::vec3(0.0f, 0.0f, 0.0f));
 	m_model = glm::scale(m_model, glm::vec3(1.0f, 1.0f, 1.0f));
 	m_shader.setMat4("model", m_model);
 
-	LOGD("VAO: {}", VAO);
-    CheckCall(glBindVertexArray(VAO));
-    CheckCall(glDrawArrays(GL_TRIANGLES, 0, 6));
-
-    CheckCall(glBindVertexArray(0));
+  CheckCall(glBindVertexArray(VAO));
+  CheckCall(glDrawArrays(GL_TRIANGLES, 0, 6));
+  CheckCall(glBindVertexArray(0));
 }

@@ -90,6 +90,7 @@ void TriangleModel::draw() {
     glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
     glDrawArrays(GL_TRIANGLES, 0, 3);
     glBindVertexArray(0);
+    glUseProgram(0);
 }
 
 TriangleModel::~TriangleModel() {

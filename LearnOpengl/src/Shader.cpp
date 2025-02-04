@@ -74,11 +74,11 @@ Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath) {
 	// 然后删除顶点着色器和片段着色器
 	CheckCall(glDeleteShader(vertexShader));
 	CheckCall(glDeleteShader(fragmentShader));
+	LOGD("ShaderProgram create ok!");
 }
 
 void Shader::use() { 
 	CheckCall(glUseProgram(shaderProgram)); 
-	LOGD("Shader use ID: {}", shaderProgram);
 }
 
 void Shader::setBool(const std::string& name, bool value) const {
@@ -92,5 +92,3 @@ void Shader::setInt(const std::string& name, int value) const {
 void Shader::setFloat(const std::string& name, float value) const {
 	CheckCall(glUniform1f(glGetUniformLocation(shaderProgram, name.c_str()), value));
 }
-
-Shader::~Shader() { CheckCall(glDeleteProgram(shaderProgram)); }

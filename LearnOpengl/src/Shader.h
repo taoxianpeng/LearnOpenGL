@@ -7,14 +7,13 @@
 
 class Shader {
  public:
-  unsigned int shaderProgram;
   Shader() = default;
   Shader(const std::string &vertexPath, const std::string &fragmentPath);
   void use();
   void setBool(const std::string &name, bool value) const;
   void setInt(const std::string &name, int value) const;
   void setFloat(const std::string &name, float value) const;
-  ~Shader();
+  ~Shader() = default;
 
   // ------------------------------------------------------------------------
   void setVec2(const std::string &name, const glm::vec2 &value) const {
@@ -53,6 +52,9 @@ class Shader {
     glUniformMatrix4fv(glGetUniformLocation(shaderProgram, name.c_str()), 1, GL_FALSE,
                        &mat[0][0]);
   }
+
+private:
+  unsigned int shaderProgram;
 };
 
 #endif

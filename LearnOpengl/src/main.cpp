@@ -87,6 +87,11 @@ int main(int argc, char** argv) {
 	gladLoadGL();
 	glfwSwapInterval(1);  // Enable vsync
 
+
+	TriangleModel triangleModel;	
+	triangleModel.loadData();
+
+
 	BigManModel bigManModel;	
 	bigManModel.loadData();
 
@@ -97,8 +102,6 @@ int main(int argc, char** argv) {
 	WindowModel windowModel;
 	windowModel.loadData();
 
-	TriangleModel triangleModel;	
-	triangleModel.loadData();
 	/* 构建窗户 Start */
 	// float verties[] = {
 	// 	-0.5f, -0.5, 0.0f, 0.0f, 0.0f,
@@ -264,49 +267,41 @@ int main(int argc, char** argv) {
 		bigManModel.setLightPosition(light_position);
 
 		bigManModel.draw();
-		// // sun
-		// sunShader.use();
-		// sunShader.setMat4("view", view);
-		// sunShader.setMat4("projection", projection);
-		// model = glm::translate(model, light_position);
-		// sunShader.setMat4("model", model);
+		 //sun
+		//sunShader.use();
+		//sunShader.setMat4("view", view);
+		//sunShader.setMat4("projection", projection);
+		//model = glm::translate(model, light_position);
+		//sunShader.setMat4("model", model);
 
-		// sunModel.draw(sunShader);
+		//sunModel.draw(sunShader);
 
-		// float scale = 1.1f;
-		// singleColorShader.use();
-		// singleColorShader.setMat4("view", view);
-		// singleColorShader.setMat4("projection", projection);
-		// model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-		// model = glm::scale(model, glm::vec3(scale, scale, scale));
-		// singleColorShader.setMat4("model", model);
+		 //float scale = 1.1f;
+		 //singleColorShader.use();
+		 //singleColorShader.setMat4("view", view);
+		 //singleColorShader.setMat4("projection", projection);
+		 //model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+		 //model = glm::scale(model, glm::vec3(scale, scale, scale));
+		 //singleColorShader.setMat4("model", model);
 
-		// sunModel.draw(singleColorShader);
+		 //sunModel.draw(singleColorShader);
 
-		// axioModel.setCamera(camera);
-		// axioModel.setModel(model);
-		// axioModel.setProjection(projection);
-		// axioModel.setView(view);
-		// axioModel.draw();
+		axioModel.setCamera(camera);
+		axioModel.setModel(model);
+		axioModel.setProjection(projection);
+		axioModel.setView(view);
+		axioModel.draw();
 
-		// windowModel.setCamera(camera);
-		// windowModel.setModel(model);
-		// windowModel.setProjection(projection);
-		// windowModel.setView(view);
-		// windowModel.draw();
+		windowModel.setCamera(camera);
+		windowModel.setModel(model);
+		windowModel.setProjection(projection);
+		windowModel.setView(view);
+		windowModel.draw();
 
 		triangleModel.draw();
 
-		// axio
-		// axioShader.use();
-		// model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-		// model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
-		// axioShader.setMat4("view", view);
-		// axioShader.setMat4("projection", projection);
-		// axioShader.setMat4("model", model);
-		// axioModel.draw(axioShader);
 
-
+		glBindVertexArray(0);
 		// 2. Show a simple window that we create ourselves. We use a Begin/End pair
 		// to create a named window.
 		{
@@ -354,8 +349,8 @@ int main(int argc, char** argv) {
 		// Render
 		glfwSwapBuffers(window);
 
-		// // 解除绑定
-		// CheckCall(glBindVertexArray(0));
+		// 解除绑定
+		CheckCall(glBindVertexArray(0));
 	}
 
 	// glDeleteBuffers(1, &EBO);
