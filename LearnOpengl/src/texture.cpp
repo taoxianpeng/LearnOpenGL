@@ -6,12 +6,12 @@
 #include <string>
 
 #include <glad/glad.h>
-
+#include "log.h"
 #include "stb_image.h"
 
 Texture::Texture()
 	: data(nullptr),
-	texture(0),
+	textureID(0),
 	textureWrapS(GL_REPEAT),
 	textureWrapT(GL_REPEAT),
 	textureMinFilter(GL_LINEAR),
@@ -22,7 +22,7 @@ Texture::Texture()
 
 Texture::Texture(Texture&& sourceTex) noexcept {
 	data = sourceTex.data;
-	texture = sourceTex.texture;
+	textureID = sourceTex.textureID;
 	textureWrapS = sourceTex.textureWrapS;
 	textureWrapT = sourceTex.textureWrapT;
 	textureMinFilter = sourceTex.textureMinFilter;
@@ -37,9 +37,8 @@ Texture::~Texture() {
 }
 
 void Texture::create(std::string_view image_path) {
-	genTexture();
 	stbi_set_flip_vertically_on_load(true);
-	texture = loadTextureFromFile(image_path);
+	loadTextureFromFile(image_path);
 }
 
 void Texture::setTextureMode(int wrapS, int wrapT, int minFilter,
@@ -51,13 +50,12 @@ void Texture::setTextureMode(int wrapS, int wrapT, int minFilter,
 }
 
 // 在渲染循环中使用
-void Texture::useTexture(int textureUnitID) {
+void Texture::useTextureUnit(int textureUnitID) {
 	glActiveTexture(textureUnitID);
-	glBindTexture(GL_TEXTURE_2D, texture);
+	glBindTexture(GL_TEXTURE_2D, textureID);
 }
 
-unsigned int Texture::loadTextureFromFile(std::string_view path) {
-	unsigned int textureID;
+void Texture::loadTextureFromFile(std::string_view path) {
 	glGenTextures(1, &textureID);
 
 	unsigned char* data =
@@ -80,16 +78,10 @@ unsigned int Texture::loadTextureFromFile(std::string_view path) {
 			textureMaxFilter);
 	}
 	else {
-		std::cout << "Texture failed to load at path: " << path << std::endl;
-		return -1;
+		LOGE("Texture failed to load at path: ", path);
+		return;
 	}
 	stbi_image_free(data);
-	return textureID;
 }
 
-void Texture::genTexture() {
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-}
-
-void Texture::freeTexture() const { glDeleteTextures(1, &texture); };
+void Texture::freeTexture() const { glDeleteTextures(1, &textureID); };

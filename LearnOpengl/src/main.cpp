@@ -213,6 +213,7 @@ int main(int argc, char** argv) {
 
 
 	CheckCall(glEnable(GL_DEPTH_TEST));
+	CheckCall(glEnable(GL_BLEND));
 
 	while (!glfwWindowShouldClose(window)) {
 		
@@ -292,14 +293,14 @@ int main(int argc, char** argv) {
 		axioModel.setView(view);
 		axioModel.draw();
 
+
+		triangleModel.draw();
+
 		windowModel.setCamera(camera);
 		windowModel.setModel(model);
 		windowModel.setProjection(projection);
 		windowModel.setView(view);
 		windowModel.draw();
-
-		triangleModel.draw();
-
 
 		glBindVertexArray(0);
 		// 2. Show a simple window that we create ourselves. We use a Begin/End pair
