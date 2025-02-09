@@ -213,6 +213,7 @@ int main(int argc, char** argv) {
 
 
 	CheckCall(glEnable(GL_DEPTH_TEST));
+	CheckCall(glEnable(GL_BLEND));
 
 	// 开启混合
 	CheckCall(glEnable(GL_BLEND));
