@@ -43,6 +43,8 @@ static unsigned int TextureFromFile(std::string_view path) {
 void Mesh::draw(Shader& shader) {
 	unsigned int diffuseNr = 1;
 	unsigned int specularNr = 1;
+
+	// 输入纹理
 	for (auto i = 0; i < textures.size(); i++) {
 		CheckCall(glActiveTexture(GL_TEXTURE0 + i));
 		std::string number;
@@ -57,6 +59,11 @@ void Mesh::draw(Shader& shader) {
 		CheckCall(glBindTexture(GL_TEXTURE_2D, textures[i].id));
 	}
 	CheckCall(glActiveTexture(GL_TEXTURE0));
+
+	// 输入纯色材质
+	//shader.setVec4("colorMaterial.ambient", mats.Ka);
+	//shader.setVec4("colorMaterial.diffuse", mats.Kd);
+	//shader.setVec4("colorMaterial.specular", mats.Ks);
 
 	//spdlog::info("******* mesh color:{},{},{}", mats.Kd.r, mats.Kd.g, mats.Kd.b);
 	CheckCall(glBindVertexArray(VAO));

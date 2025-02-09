@@ -1,9 +1,9 @@
 #ifndef SHADER_H
 #define SHADER_H
 #include <glad/glad.h>
-
 #include <glm.hpp>
 #include <string>
+#include "log.h"
 
 class Shader {
  public:
@@ -31,7 +31,7 @@ class Shader {
   }
   // ------------------------------------------------------------------------
   void setVec4(const std::string &name, const glm::vec4 &value) const {
-    glUniform4fv(glGetUniformLocation(shaderProgram, name.c_str()), 1, &value[0]);
+    CheckCall(glUniform4fv(glGetUniformLocation(shaderProgram, name.c_str()), 1, &value[0]));
   }
   void setVec4(const std::string &name, float x, float y, float z,
                float w) const {

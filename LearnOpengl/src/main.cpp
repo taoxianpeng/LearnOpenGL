@@ -20,6 +20,7 @@
 #include "axio_model.h"
 #include "window_model.h"
 #include "triangle_model.h"
+#include "car_model.h"
 
 using namespace std;
 
@@ -102,6 +103,8 @@ int main(int argc, char** argv) {
 	WindowModel windowModel;
 	windowModel.loadData();
 
+	CarModel carModel;
+	carModel.loadData();
 	/* 构建窗户 Start */
 	// float verties[] = {
 	// 	-0.5f, -0.5, 0.0f, 0.0f, 0.0f,
@@ -298,8 +301,15 @@ int main(int argc, char** argv) {
 		windowModel.setView(view);
 		windowModel.draw();
 
-		triangleModel.draw();
+		//triangleModel.draw();
 
+		carModel.setCamera(camera);
+		carModel.setLightMaterial(light_material);
+		carModel.setLightPosition(light_position);
+		carModel.setModel(model);
+		carModel.setProjection(projection);
+		carModel.setView(view);
+		carModel.draw();
 
 		glBindVertexArray(0);
 		// 2. Show a simple window that we create ourselves. We use a Begin/End pair
