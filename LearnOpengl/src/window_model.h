@@ -13,6 +13,7 @@ public:
   const Camera &getCamera() const { return m_camera; }
 
 private:
+  Texture texture;
   Shader m_shader;
   MMesh::Model m_meshModel;
   Camera m_camera;
