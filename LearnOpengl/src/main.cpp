@@ -20,6 +20,7 @@
 #include "axio_model.h"
 #include "window_model.h"
 #include "triangle_model.h"
+#include "geometry_ex.h"
 
 using namespace std;
 
@@ -101,6 +102,9 @@ int main(int argc, char** argv) {
 
 	WindowModel windowModel;
 	windowModel.loadData();
+
+	GeometryEx geometryEx;
+	geometryEx.loadData();
 
 	/* 构建窗户 Start */
 	// float verties[] = {
@@ -263,14 +267,14 @@ int main(int argc, char** argv) {
 			100.0f);
 		glm::mat4 model = glm::mat4(1.0f);
 
-		bigManModel.setView(view);
-		bigManModel.setModel(model);
-		bigManModel.setProjection(projection);
-		bigManModel.setCamera(camera);
-		bigManModel.setLightMaterial(light_material);
-		bigManModel.setLightPosition(light_position);
+		//bigManModel.setView(view);
+		//bigManModel.setModel(model);
+		//bigManModel.setProjection(projection);
+		//bigManModel.setCamera(camera);
+		//bigManModel.setLightMaterial(light_material);
+		//bigManModel.setLightPosition(light_position);
 
-		bigManModel.draw();
+		//bigManModel.draw();
 		 //sun
 		//sunShader.use();
 		//sunShader.setMat4("view", view);
@@ -290,20 +294,22 @@ int main(int argc, char** argv) {
 
 		 //sunModel.draw(singleColorShader);
 
-		axioModel.setCamera(camera);
-		axioModel.setModel(model);
-		axioModel.setProjection(projection);
-		axioModel.setView(view);
-		axioModel.draw();
+		//axioModel.setCamera(camera);
+		//axioModel.setModel(model);
+		//axioModel.setProjection(projection);
+		//axioModel.setView(view);
+		//axioModel.draw();
 
 
-		triangleModel.draw();
+		//triangleModel.draw();
 
-		windowModel.setCamera(camera);
-		windowModel.setModel(model);
-		windowModel.setProjection(projection);
-		windowModel.setView(view);
-		windowModel.draw();
+		//windowModel.setCamera(camera);
+		//windowModel.setModel(model);
+		//windowModel.setProjection(projection);
+		//windowModel.setView(view);
+		//windowModel.draw();
+
+		geometryEx.draw();
 
 		glBindVertexArray(0);
 		// 2. Show a simple window that we create ourselves. We use a Begin/End pair
