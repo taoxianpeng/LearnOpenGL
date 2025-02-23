@@ -1,7 +1,6 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <checkError.h>
 #include <iostream>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -23,6 +22,12 @@
 #include "geometry_ex.h"
 
 using namespace std;
+
+#if defined (_WIN32) || defined (_WIN64)
+	#define WIN
+#elif defined (__linux__) 
+	#define LINUX
+#endif
 
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
@@ -59,7 +64,11 @@ void framebufferWindow(GLuint textureID) {
 
 int main(int argc, char** argv) {
 
-	Direction::getInstance()->loadConfig("config.json");
+#ifdef WIN 
+	Direction::getInstance()->loadConfig("config_win.json");
+#elif defined (LINUX)
+	Direction::getInstance()->loadConfig("config_linux.json");
+#endif
 
 	init_logger();
 

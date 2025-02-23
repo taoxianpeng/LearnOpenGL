@@ -1,7 +1,6 @@
 #include "geometry_ex.h"
 #include "log.h"
 #include "direction.h"
-#include "checkError.h"
 
 void GeometryEx::loadData()
 {

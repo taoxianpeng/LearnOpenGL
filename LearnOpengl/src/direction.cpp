@@ -14,6 +14,7 @@ void Direction::loadConfig(const std::filesystem::path& path) {
         std::ifstream f(path.string());   
         config = njson::parse(f);
         m_projectRootPath = std::filesystem::path(std::string(config["projection_root_path"]));
+        LOGD("projectRootPath: {}", m_projectRootPath);
     } catch (std::exception& e) {
         LOGE("{}", e.what());
     }

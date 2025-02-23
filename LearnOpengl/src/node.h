@@ -2,7 +2,7 @@
 
 #include <string>
 #include <spdlog/spdlog.h>
-#include <glm.hpp>
+#include <glm/glm.hpp>
 #include "camera.h"
 #include "common.h"
 #include "mesh.h"

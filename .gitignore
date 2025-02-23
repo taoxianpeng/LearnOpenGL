@@ -4,3 +4,5 @@ build
 .vscode/settings.json
 .cache
 build_vs2022
+.xmake/
+compile_commands.json
