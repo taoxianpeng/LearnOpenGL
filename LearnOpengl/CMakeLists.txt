@@ -45,7 +45,7 @@ endif()
 
 file(GLOB IMGUI_FILES thirdParty/Common/imgui/*.cpp thirdParty/Common/imgui/backends/*.cpp)
 		
-add_subdirectory(wrapper)
+#add_subdirectory(wrapper)
 
 # 将源代码添加到此项目的可执行文件。
 file(GLOB SRC_FILES src/*.cpp src/*.c src/*.h)
@@ -61,7 +61,7 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	set(glfw glfw3)
 	set(glew GLEW)
 	set(assimp assimp)
-	set(wrapper wrapper)
+  #	set(wrapper wrapper)
 
 	target_link_libraries(${PROJECT_NAME} ${glfw} ${glew} ${assimp} ${wrapper} GL)
 
@@ -75,10 +75,13 @@ elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	set(glfw glfw3)
 	set(glew glew32)
 	set(assimp assimp-vc143-mt)
-	set(wrapper wrapper)
+  # set(wrapper wrapper)
 
 	target_link_libraries(${PROJECT_NAME} opengl32 ${glfw} ${glew} ${assimp} ${wrapper})
 endif()
 
-file(COPY ${CMAKE_SOURCE_DIR}/config.json DESTINATION ${CMAKE_BINARY_DIR})
-# TODO: 如有需要，请添加测试并安装目标。
+if(${CMAKE_SYSTEM_NAME} MATCHES  "Linux")
+  file(COPY ${CMAKE_SOURCE_DIR}/config_linux.json DESTINATION ${CMAKE_BINARY_DIR})
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+  file(COPY ${CMAKE_SOURCE_DIR}/config_windows.json DESTINATION ${CMAKE_BINARY_DIR})
+endif()
