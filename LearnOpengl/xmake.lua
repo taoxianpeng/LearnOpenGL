@@ -3,7 +3,7 @@ add_languages("c++20")
 set_optimize("fastest")
 add_rules("mode.debug", "mode.release")
 add_rules("plugin.compile_commands.autoupdate")
-add_requires("GL", "glfw", "glad", "assimp", "glew", "glm", "spdlog", "nlohmann_json")
+add_requires("glfw", "glad", "assimp", "glew", "glm", "spdlog", "nlohmann_json")
 add_requires("imgui", {configs = {glfw_opengl3 = true, opengl3 = true}})
 
 -- 定义复制规则
@@ -21,7 +21,7 @@ target("learnopengl")
     set_kind("binary")
     add_files("src/*.cpp")
     add_includedirs(src)
-    add_packages("GL", "glfw", "imgui", "glad", "assimp", "glew", "glm", "spdlog", "nlohmann_json")
+    add_packages("glfw", "imgui", "glad", "assimp", "glew", "glm", "spdlog", "nlohmann_json")
     add_rules("copy_config")
 
 --
