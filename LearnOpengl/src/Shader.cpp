@@ -4,77 +4,24 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <bitset>
 
 // #include "ShaderSource.h"
 
 Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath) {
-	std::string vertexCode;
-	std::string fragmentCode;
-	std::ifstream vShaderFile;
-	std::ifstream fShaderFile;
 
-	vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-	fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+	std::string vertexCode = readFromFile(vertexPath);
+	std::string fragmentCode = readFromFile(fragmentPath);
 
-	try {
-		vShaderFile.open(vertexPath);
-		fShaderFile.open(fragmentPath);
-		std::stringstream vShaderStream, fShaderStream;
-		vShaderStream << vShaderFile.rdbuf();
-		fShaderStream << fShaderFile.rdbuf();
+	PipelineShader pipelineShader;
+	pipelineShader.VertexShader = createShader(vertexCode, GL_VERTEX_SHADER);
+	pipelineShader.FragmentShader = createShader(fragmentCode, GL_FRAGMENT_SHADER);
 
-		vShaderFile.close();
-		fShaderFile.close();
+	shaderProgram = createProgram(pipelineShader);
+}
 
-		vertexCode = vShaderStream.str();
-		fragmentCode = fShaderStream.str();
-
-	}
-	catch (std::ifstream::failure e) {
-		LOGE("ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ {}", e.what());
-	}
-
-	const char* vShaderCode = vertexCode.c_str();
-	const char* fShaderCode = fragmentCode.c_str();
-
-	unsigned int vertexShader, fragmentShader;
-	int success;
-	char infoLog[512];
-
-	vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	CheckCall(glShaderSource(vertexShader, 1, &vShaderCode, NULL));
-	CheckCall(glCompileShader(vertexShader));
-	CheckCall(glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success));
-	if (!success) {
-		// 获取编译信息，存储到字符数组中，然后打印出来
-		CheckCall(glGetShaderInfoLog(vertexShader, 512, NULL, infoLog));
-		LOGE("ERROR::SHADER::VERTEX::COMPLIATION_FAILED {}", infoLog);
-	}
-
-	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	CheckCall(glShaderSource(fragmentShader, 1, &fShaderCode, NULL));
-	CheckCall(glCompileShader(fragmentShader));
-	CheckCall(glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success));
-	if (!success) {
-		CheckCall(glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog));
-		LOGE("ERROR::SHADER::FRAGMENT::COMPLIATION_FAILED {}", infoLog);
-	}
-
-	shaderProgram = glCreateProgram();
-	CheckCall(glAttachShader(shaderProgram, vertexShader));
-	CheckCall(glAttachShader(shaderProgram, fragmentShader));
-	CheckCall(glLinkProgram(shaderProgram));
-
-	CheckCall(glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success));
-	if (!success) {
-		CheckCall(glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog));
-		LOGE("ERROR::LinkProgram::LINK_FAILED {}", infoLog);
-	}
-
-	// 然后删除顶点着色器和片段着色器
-	CheckCall(glDeleteShader(vertexShader));
-	CheckCall(glDeleteShader(fragmentShader));
-	LOGD("ShaderProgram create ok!");
+Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath, const std::string& geometryPath)
+{
 }
 
 void Shader::use() { 
@@ -91,4 +38,96 @@ void Shader::setInt(const std::string& name, int value) const {
 
 void Shader::setFloat(const std::string& name, float value) const {
 	CheckCall(glUniform1f(glGetUniformLocation(shaderProgram, name.c_str()), value));
+}
+
+GLuint Shader::createShader(const std::string& codeStr, GLuint shaderType)
+{
+	GLuint shader;
+	int success;
+	char infoLog[512];
+	const char* fShaderCode = codeStr.c_str();
+
+	shader = glCreateShader(shaderType);
+	CheckCall(glShaderSource(shader, 1, &fShaderCode, NULL));
+	CheckCall(glCompileShader(shader));
+	CheckCall(glGetShaderiv(shader, GL_COMPILE_STATUS, &success));
+	if (!success) {
+		CheckCall(glGetShaderInfoLog(shader, 512, NULL, infoLog));
+		LOGE("ERROR::SHADER::FRAGMENT::COMPLIATION_FAILED {}", infoLog);
+	}
+	return shader;
+}
+
+GLuint Shader::createProgram(const PipelineShader& pipelineShader)
+{
+	GLuint _program = glCreateProgram();
+	std::bitset<PipelineType::Max> shaderFlag;
+
+	if (pipelineShader.VertexShader != 0) {
+		shaderFlag.set(PipelineType::VertexShader);
+		CheckCall(glAttachShader(_program, pipelineShader.VertexShader));
+	}
+	if (pipelineShader.TessellationShader != 0) {
+		shaderFlag.set(PipelineType::TessellationShader);
+		CheckCall(glAttachShader(_program, pipelineShader.TessellationShader));
+	}
+	if (pipelineShader.GeometryShader != 0) {
+		shaderFlag.set(PipelineType::GeometryShader);
+		CheckCall(glAttachShader(_program, pipelineShader.GeometryShader));
+	}
+	if (pipelineShader.FragmentShader != 0) {
+		shaderFlag.set(PipelineType::FragmentShader);
+		CheckCall(glAttachShader(_program, pipelineShader.FragmentShader));
+	}
+
+	if (shaderFlag.any()) {
+		int success;
+		char infoLog[512];
+		CheckCall(glLinkProgram(_program));
+		CheckCall(glGetProgramiv(_program, GL_LINK_STATUS, &success));
+		if (!success) {
+			CheckCall(glGetProgramInfoLog(_program, 512, NULL, infoLog));
+			LOGE("ERROR::LinkProgram::LINK_FAILED {}", infoLog);
+		}
+	}
+
+	// 然后删除顶点着色器和片段着色器
+	if (shaderFlag.test(PipelineType::VertexShader)) {
+		CheckCall(glDeleteShader(pipelineShader.VertexShader));
+	}
+	if (shaderFlag.test(PipelineType::TessellationShader)) {
+		CheckCall(glDeleteShader(pipelineShader.TessellationShader));
+	}
+	if (shaderFlag.test(PipelineType::GeometryShader)) {
+		CheckCall(glDeleteShader(pipelineShader.GeometryShader));
+	}
+	if (shaderFlag.test(PipelineType::FragmentShader)) {
+		CheckCall(glDeleteShader(pipelineShader.FragmentShader));
+	}
+
+	LOGD("ShaderProgram create ok!");
+	return _program;
+}
+
+std::string Shader::readFromFile(const std::string& path)
+{
+	std::string code;
+	std::ifstream file;
+
+	file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+
+	try {
+		file.open(path);
+		std::stringstream vCodeStream;
+		vCodeStream << file.rdbuf();
+
+		file.close();
+
+		code = vCodeStream.str();
+	}
+	catch (std::ifstream::failure e) {
+		LOGE("ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ {}", e.what());
+	}
+
+	return code;
 }

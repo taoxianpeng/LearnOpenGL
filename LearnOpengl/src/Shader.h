@@ -2,13 +2,19 @@
 #define SHADER_H
 #include <glad/glad.h>
 
+#if WIN32
+#include <glm.hpp>
+#else
 #include <glm/glm.hpp>
+#endif
+
 #include <string>
 
 class Shader {
  public:
   Shader() = default;
   Shader(const std::string &vertexPath, const std::string &fragmentPath);
+  Shader(const std::string &vertexPath, const std::string &fragmentPath, const std::string& geometryPath);
   void use();
   void setBool(const std::string &name, bool value) const;
   void setInt(const std::string &name, int value) const;
@@ -52,6 +58,26 @@ class Shader {
     glUniformMatrix4fv(glGetUniformLocation(shaderProgram, name.c_str()), 1, GL_FALSE,
                        &mat[0][0]);
   }
+
+  struct PipelineShader {
+    GLuint VertexShader = 0;
+    GLuint GeometryShader = 0;
+    GLuint TessellationShader = 0;
+    GLuint FragmentShader = 0;
+  };
+
+  enum PipelineType {
+    VertexShader,
+    GeometryShader,
+    TessellationShader,
+    FragmentShader,
+    Max
+  };
+  
+private:
+  GLuint createShader(const std::string& codeStr, GLuint shaderType);
+  GLuint createProgram(const PipelineShader& pipelineShader);
+  std::string readFromFile(const std::string& path);
 
 private:
   unsigned int shaderProgram;

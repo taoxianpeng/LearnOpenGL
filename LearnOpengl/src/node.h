@@ -2,7 +2,13 @@
 
 #include <string>
 #include <spdlog/spdlog.h>
+
+#if WIN32
+#include <glm.hpp>
+#else
 #include <glm/glm.hpp>
+#endif
+
 #include "camera.h"
 #include "common.h"
 #include "mesh.h"
