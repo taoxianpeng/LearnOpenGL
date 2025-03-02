@@ -7,6 +7,7 @@ void GeometryEx::loadData()
 	const std::string resourcePath = Direction::getInstance()->getProjectRootPath().string();
 	std::string vertPath = resourcePath + "/shader/geometry_ex.vert";
 	std::string fragPath = resourcePath + "/shader/geometry_ex.frag";
+	std::string geomPath = resourcePath + "/shader/geometry_ex.geom";
 
 	LOGI("vertPath:{}", vertPath);
 	LOGI("fragPath:{}", fragPath);
@@ -31,7 +32,7 @@ void GeometryEx::loadData()
   CheckCall(glBindBuffer(GL_ARRAY_BUFFER, 0));
   CheckCall(glBindVertexArray(0));
   
-	m_shader = Shader(vertPath, fragPath);
+	m_shader = Shader(vertPath, fragPath, geomPath);
 }
 
 void GeometryEx::draw()

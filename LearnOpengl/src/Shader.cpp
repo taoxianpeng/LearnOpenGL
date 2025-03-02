@@ -22,6 +22,16 @@ Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath) {
 
 Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath, const std::string& geometryPath)
 {
+	std::string vertexCode = readFromFile(vertexPath);
+	std::string fragmentCode = readFromFile(fragmentPath);
+	std::string geometryCode = readFromFile(geometryPath);
+
+	PipelineShader pipelineShader;
+	pipelineShader.VertexShader = createShader(vertexCode, GL_VERTEX_SHADER);
+	pipelineShader.FragmentShader = createShader(fragmentCode, GL_FRAGMENT_SHADER);
+	pipelineShader.GeometryShader = createShader(geometryCode, GL_GEOMETRY_SHADER);
+
+	shaderProgram = createProgram(pipelineShader);
 }
 
 void Shader::use() { 
