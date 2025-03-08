@@ -20,7 +20,8 @@ include_directories(
 	thirdParty/Common/imgui/backends	
 	thirdParty/Common/nlohmann/single_include
 
-	src
+	src/application
+	src/core/include
 )
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
@@ -48,7 +49,14 @@ file(GLOB IMGUI_FILES thirdParty/Common/imgui/*.cpp thirdParty/Common/imgui/back
 #add_subdirectory(wrapper)
 
 # 将源代码添加到此项目的可执行文件。
-file(GLOB SRC_FILES src/*.cpp src/*.c src/*.h)
+file(GLOB SRC_FILES
+	src/*.cpp 
+	src/core/src/*.cpp 
+	src/core/src/*.c 
+	src/application/*.cpp 
+	src/core/include/*.h
+)
+
 add_executable (${PROJECT_NAME} ${SRC_FILES} ${IMGUI_FILES})
 		
 if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
