@@ -13,10 +13,10 @@ void GeometryEx::loadData()
 	LOGI("fragPath:{}", fragPath);
 
   points = {
-    -0.5f,  0.5f, // 左上
-     0.5f,  0.5f, // 右上
-     0.5f, -0.5f, // 右下
-    -0.5f, -0.5f  // 左下
+    -0.5f,  0.5f, 1.0f, 1.0f, 1.0f, // 左上
+     0.5f,  0.5f, 0.7f, 0.7f, 0.7f,// 右上
+     0.5f, -0.5f, 0.4f, 0.4f, 0.4f,// 右下
+    -0.5f, -0.5f, 0.1f, 0.1f, 0.1f// 左下
   };
 
   CheckCall(glGenVertexArrays(1, &VAO));
@@ -26,8 +26,11 @@ void GeometryEx::loadData()
   CheckCall(glBindBuffer(GL_ARRAY_BUFFER, VBO));
   CheckCall(glBufferData(GL_ARRAY_BUFFER, points.size() * sizeof(float), points.data(), GL_STATIC_DRAW));
 
-  CheckCall(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)(0)));
+  CheckCall(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(0)));
   CheckCall(glEnableVertexAttribArray(0));
+
+  CheckCall(glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(0)));
+  CheckCall(glEnableVertexAttribArray(1));
   
   CheckCall(glBindBuffer(GL_ARRAY_BUFFER, 0));
   CheckCall(glBindVertexArray(0));

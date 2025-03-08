@@ -2,8 +2,15 @@
 layout (points) in;
 layout (triangle_strip, max_vertices = 5) out;
 
-void build_house(vec4 position)
+out vec3 fColor;
+
+in VS_OUT_DATA {
+    vec3 Color;
+} vs_in_data[];
+
+void build_house(vec4 position, vec3 color)
 {    
+    fColor = color;
     gl_Position = position + vec4(-0.2, -0.2, 0.0, 0.0);    // 1:左下
     EmitVertex();   
     gl_Position = position + vec4( 0.2, -0.2, 0.0, 0.0);    // 2:右下
@@ -18,5 +25,5 @@ void build_house(vec4 position)
 }
 
 void main() {    
-    build_house(gl_in[0].gl_Position);
+    build_house(gl_in[0].gl_Position, vs_in_data[0].Color);
 }
