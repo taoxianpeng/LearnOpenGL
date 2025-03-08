@@ -20,6 +20,7 @@ void build_house(vec4 position, vec3 color)
     gl_Position = position + vec4( 0.2,  0.2, 0.0, 0.0);    // 4:右上
     EmitVertex();
     gl_Position = position + vec4( 0.0,  0.4, 0.0, 0.0);    // 5:顶部
+    fColor = vec3(1.0, 1.0, 1.0);
     EmitVertex();
     EndPrimitive();
 }
