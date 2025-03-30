@@ -322,7 +322,7 @@ int main(int argc, char** argv) {
 		//windowModel.setView(view);
 		//windowModel.draw();
 
-		geometryEx.draw();
+		//geometryEx.draw();
 		instancingEx.draw();
 
 		glBindVertexArray(0);

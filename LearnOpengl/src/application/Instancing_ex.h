@@ -15,6 +15,7 @@ public:
 private:
   GLuint VAO;
   GLuint VBO;
+  GLuint instanceVBO;
   GLuint EBO;
 
   Shader m_shader;
