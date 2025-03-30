@@ -20,6 +20,7 @@
 #include "window_model.h"
 #include "triangle_model.h"
 #include "geometry_ex.h"
+#include "Instancing_ex.h"
 
 using namespace std;
 
@@ -114,6 +115,9 @@ int main(int argc, char** argv) {
 
 	GeometryEx geometryEx;
 	geometryEx.loadData();
+
+	InstancingEx instancingEx;
+	instancingEx.loadData();
 
 	/* 构建窗户 Start */
 	// float verties[] = {
@@ -319,6 +323,7 @@ int main(int argc, char** argv) {
 		//windowModel.draw();
 
 		geometryEx.draw();
+		instancingEx.draw();
 
 		glBindVertexArray(0);
 		// 2. Show a simple window that we create ourselves. We use a Begin/End pair
