@@ -2,6 +2,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <memory>
 
 #define STB_IMAGE_IMPLEMENTATION
 
@@ -14,6 +15,7 @@
 #include "mesh.h"
 #include "texture.h"
 #include "direction.h"
+#include "RenderManager.h"
 
 #include "big_man_model.h"
 #include "axio_model.h"
@@ -63,6 +65,39 @@ void framebufferWindow(GLuint textureID) {
 	ImGui::End();
 }
 
+void projectLoad() {
+	auto geometryNode = std::make_shared<GeometryEx>();
+	geometryNode->setName("Window");
+	geometryNode->setVisible(false);
+	RenderManager::getInstance().addNode(geometryNode);
+
+	auto windowNode = std::make_shared<WindowModel>();
+	windowNode->setName("Window");
+	windowNode->setVisible(false);
+	RenderManager::getInstance().addNode(windowNode);
+
+	auto axioNode = std::make_shared<AxioModel>();
+	axioNode->setName("Axio");
+	axioNode->setVisible(false);
+	RenderManager::getInstance().addNode(axioNode);
+
+	auto bigmanNode = std::make_shared<BigManModel>();
+	bigmanNode->setName("BigMan");
+	bigmanNode->setVisible(true);
+	RenderManager::getInstance().addNode(bigmanNode);
+
+	auto triangleNode = std::make_shared<TriangleModel>();
+	triangleNode->setName("Triangle");
+	triangleNode->setVisible(false);
+	RenderManager::getInstance().addNode(triangleNode);
+
+	auto instanceExNode = std::make_shared<InstancingEx>();
+	instanceExNode->setName("instanceEx");
+	instanceExNode->setVisible(false);
+	RenderManager::getInstance().addNode(instanceExNode);
+
+}
+
 int main(int argc, char** argv) {
 
 #ifdef WIN 
@@ -99,26 +134,8 @@ int main(int argc, char** argv) {
 	glfwSwapInterval(1);  // Enable vsync
 
 
-	TriangleModel triangleModel;	
-	triangleModel.loadData();
-
-
-	BigManModel bigManModel;	
-	bigManModel.loadData();
-
-	// axio
-	AxioModel axioModel;
-	axioModel.loadData();
-
-	WindowModel windowModel;
-	windowModel.loadData();
-
-	GeometryEx geometryEx;
-	geometryEx.loadData();
-
-	InstancingEx instancingEx;
-	instancingEx.loadData();
-
+	projectLoad();
+	RenderManager::getInstance().loadResource();
 
 	//// create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
 	//unsigned int rbo;
@@ -233,55 +250,10 @@ int main(int argc, char** argv) {
 			static_cast<float>(SCR_WIDTH) / static_cast<float>(SCR_HEIGHT), 0.1f,
 			100.0f);
 		glm::mat4 model = glm::mat4(1.0f);
+		
+		RenderManager::getInstance().setMPV(projection, view, model);
+		RenderManager::getInstance().drawAll();
 
-		//bigManModel.setView(view);
-		//bigManModel.setModel(model);
-		//bigManModel.setProjection(projection);
-		//bigManModel.setCamera(camera);
-		//bigManModel.setLightMaterial(light_material);
-		//bigManModel.setLightPosition(light_position);
-
-		//bigManModel.draw();
-		 //sun
-		//sunShader.use();
-		//sunShader.setMat4("view", view);
-		//sunShader.setMat4("projection", projection);
-		//model = glm::translate(model, light_position);
-		//sunShader.setMat4("model", model);
-
-		//sunModel.draw(sunShader);
-
-		 //float scale = 1.1f;
-		 //singleColorShader.use();
-		 //singleColorShader.setMat4("view", view);
-		 //singleColorShader.setMat4("projection", projection);
-		 //model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-		 //model = glm::scale(model, glm::vec3(scale, scale, scale));
-		 //singleColorShader.setMat4("model", model);
-
-		 //sunModel.draw(singleColorShader);
-
-		//axioModel.setCamera(camera);
-		//axioModel.setModel(model);
-		//axioModel.setProjection(projection);
-		//axioModel.setView(view);
-		//axioModel.draw();
-
-
-		//triangleModel.draw();
-
-		//windowModel.setCamera(camera);
-		//windowModel.setModel(model);
-		//windowModel.setProjection(projection);
-		//windowModel.setView(view);
-		//windowModel.draw();
-
-		//geometryEx.draw();
-		instancingEx.draw();
-
-		glBindVertexArray(0);
-		// 2. Show a simple window that we create ourselves. We use a Begin/End pair
-		// to create a named window.
 		{
 			static float f = 0.0f;
 			static int counter = 0;
@@ -331,8 +303,6 @@ int main(int argc, char** argv) {
 		CheckCall(glBindVertexArray(0));
 	}
 
-	// glDeleteBuffers(1, &EBO);
-	// Cleanup
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();

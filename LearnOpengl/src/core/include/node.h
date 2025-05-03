@@ -20,6 +20,22 @@ public:
   explicit Node() = default;
   virtual ~Node() = default;
 
+  void setName(const std::string& name) {
+    m_name = name;
+  }
+
+  const std::string& getName() const {
+    return m_name;
+  }
+
+  void setVisible(const bool& visible) {
+    m_visible = visible;
+  }
+
+  const bool& getVisible() const {
+    return m_visible;
+  }
+
   virtual void loadData() = 0;
   virtual void draw() = 0; 
 
@@ -51,4 +67,6 @@ protected:
   glm::mat4 m_view;
   glm::mat4 m_model;
   glm::mat4 m_projection;
+  bool m_visible = false;
+  std::string m_name;
 };
