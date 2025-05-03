@@ -7,7 +7,7 @@
 void InstancingEx::loadData()
 {
   float quadVertices[] = {
-    // Î»ÖÃ          // ÑÕÉ«
+    // Î»ï¿½ï¿½          // ï¿½ï¿½É«
     -0.05f,  0.05f,  1.0f, 0.0f, 0.0f,
      0.05f, -0.05f,  0.0f, 1.0f, 0.0f,
     -0.05f, -0.05f,  0.0f, 0.0f, 1.0f,
@@ -33,7 +33,6 @@ void InstancingEx::loadData()
   CheckCall(glGenBuffers(1, &instanceVBO));
   CheckCall(glBindBuffer(GL_ARRAY_BUFFER, instanceVBO));
   CheckCall(glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * 100, &translations[0], GL_STATIC_DRAW));
-  CheckCall(glBufferData, 0);
 
   CheckCall(glGenVertexArrays(1, &VAO));
   CheckCall(glGenBuffers(1, &VBO));
