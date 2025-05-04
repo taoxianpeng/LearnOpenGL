@@ -294,10 +294,15 @@ void processInput(GLFWwindow* window) {
 		camera.ProcessKeyboard(DOWN, deltaTime);
 
 	KeyActionEvent actionEvent;
-	KeyEvent keyEvent;
-	for (auto keyItem = static_cast<int>(KeyEvent::KEY_SPACE); keyItem != static_cast<int>(KeyEvent::KEY_MAX); ++keyItem) {
+	for (auto keyItem = static_cast<int>(KeyEvent::KEY_SPACE); keyItem < static_cast<int>(KeyEvent::KEY_MAX); ++keyItem) {
 		actionEvent = static_cast<KeyActionEvent>(glfwGetKey(window, keyItem));
-		application->onKeyInputEvent(keyEvent, actionEvent);	
+		if (actionEvent == KeyActionEvent::PRESS) {
+			application->onKeyInputEvent(static_cast<KeyEvent>(keyItem), KeyActionEvent::PRESS);	
+		} else if (actionEvent == KeyActionEvent::RELEASE) {
+			// application->onKeyInputEvent(static_cast<KeyEvent>(keyItem), KeyActionEvent::RELEASE);	
+		} else if (actionEvent == KeyActionEvent::REPEAT) {
+			application->onKeyInputEvent(static_cast<KeyEvent>(keyItem), KeyActionEvent::REPEAT);	
+		}
 	}
 
 }

@@ -45,7 +45,7 @@ void MyApplication::onProjectLoad()
 
 void MyApplication::onKeyInputEvent(const KeyEvent& keyEvent, const KeyActionEvent& keyActionEvent)
 {
-    // LOGD("key: {}, action: {}", static_cast<int>(keyEvent), static_cast<int>(keyActionEvent));
+    LOGD("key: {}, action: {}", static_cast<int>(keyEvent), static_cast<int>(keyActionEvent));
 }
 
 
