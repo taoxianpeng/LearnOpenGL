@@ -14,10 +14,15 @@ rule("copy_config")
 
 target("learnopengl")
     set_kind("binary")
-    add_files("src/*.cpp", "src/application/*.cpp", "src/core/src/*.cpp")
+    add_files(
+        "src/*.cpp", 
+        "src/application/*.cpp", 
+        "src/core/src/*.cpp"
+        )
     add_includedirs(
         "src/application",
-        "src/core/include"
+        "src/core/include",
+        "src/modules/keyboard/include"
         )
     add_packages("glfw", "imgui", "glad", "assimp", "glew", "glm", "spdlog", "nlohmann_json")
     add_rules("copy_config", {always_run = true}) 

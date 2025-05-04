@@ -1,8 +1,6 @@
-
+#include "application.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <iostream>
-#include <memory>
 
 #define STB_IMAGE_IMPLEMENTATION
 
@@ -12,17 +10,9 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
-#include "mesh.h"
-#include "texture.h"
 #include "direction.h"
 #include "RenderManager.h"
-
-#include "big_man_model.h"
-#include "axio_model.h"
-#include "window_model.h"
-#include "triangle_model.h"
-#include "geometry_ex.h"
-#include "Instancing_ex.h"
+#include "keyboard.h"
 
 using namespace std;
 
@@ -31,6 +21,9 @@ using namespace std;
 #elif defined (__linux__) 
 	#define LINUX
 #endif
+
+extern Application* createApplication();
+Application* application = createApplication();
 
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
@@ -65,38 +58,6 @@ void framebufferWindow(GLuint textureID) {
 	ImGui::End();
 }
 
-void projectLoad() {
-	auto geometryNode = std::make_shared<GeometryEx>();
-	geometryNode->setName("Window");
-	geometryNode->setVisible(false);
-	RenderManager::getInstance().addNode(geometryNode);
-
-	auto windowNode = std::make_shared<WindowModel>();
-	windowNode->setName("Window");
-	windowNode->setVisible(false);
-	RenderManager::getInstance().addNode(windowNode);
-
-	auto axioNode = std::make_shared<AxioModel>();
-	axioNode->setName("Axio");
-	axioNode->setVisible(false);
-	RenderManager::getInstance().addNode(axioNode);
-
-	auto bigmanNode = std::make_shared<BigManModel>();
-	bigmanNode->setName("BigMan");
-	bigmanNode->setVisible(true);
-	RenderManager::getInstance().addNode(bigmanNode);
-
-	auto triangleNode = std::make_shared<TriangleModel>();
-	triangleNode->setName("Triangle");
-	triangleNode->setVisible(false);
-	RenderManager::getInstance().addNode(triangleNode);
-
-	auto instanceExNode = std::make_shared<InstancingEx>();
-	instanceExNode->setName("instanceEx");
-	instanceExNode->setVisible(false);
-	RenderManager::getInstance().addNode(instanceExNode);
-
-}
 
 int main(int argc, char** argv) {
 
@@ -134,7 +95,9 @@ int main(int argc, char** argv) {
 	glfwSwapInterval(1);  // Enable vsync
 
 
-	projectLoad();
+	application->initializeGL();
+	application->onProjectLoad();
+
 	RenderManager::getInstance().loadResource();
 
 	//// create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
@@ -242,6 +205,7 @@ int main(int argc, char** argv) {
 			GL_STENCIL_BUFFER_BIT
 		));
 
+		application->onUpdate();
 
 		// create transformations
 		glm::mat4 view = camera.GetViewMatrix();
@@ -328,6 +292,14 @@ void processInput(GLFWwindow* window) {
 		camera.ProcessKeyboard(UP, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
 		camera.ProcessKeyboard(DOWN, deltaTime);
+
+	KeyActionEvent actionEvent;
+	KeyEvent keyEvent;
+	for (auto keyItem = static_cast<int>(KeyEvent::KEY_SPACE); keyItem != static_cast<int>(KeyEvent::KEY_MAX); ++keyItem) {
+		actionEvent = static_cast<KeyActionEvent>(glfwGetKey(window, keyItem));
+		application->onKeyInputEvent(keyEvent, actionEvent);	
+	}
+
 }
 
 void mouse_callback(GLFWwindow* window, double xposIn, double yposIn) {
