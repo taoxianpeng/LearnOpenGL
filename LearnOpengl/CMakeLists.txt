@@ -22,6 +22,7 @@ include_directories(
 
 	src/application
 	src/core/include
+	src/modules/keyboard/include
 )
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
@@ -55,6 +56,7 @@ file(GLOB SRC_FILES
 	src/core/src/*.c 
 	src/application/*.cpp 
 	src/core/include/*.h
+	src/modules/keyboard/include/*.h
 )
 
 add_executable (${PROJECT_NAME} ${SRC_FILES} ${IMGUI_FILES})
@@ -92,4 +94,5 @@ if(${CMAKE_SYSTEM_NAME} MATCHES  "Linux")
   file(COPY ${CMAKE_SOURCE_DIR}/config_linux.json DESTINATION ${CMAKE_BINARY_DIR})
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   file(COPY ${CMAKE_SOURCE_DIR}/config_win.json DESTINATION ${CMAKE_BINARY_DIR})
+  file(COPY ${CMAKE_SOURCE_DIR}/thirdParty/Win64/assimp/lib/assimp-vc143-mt.dll DESTINATION ${CMAKE_BINARY_DIR})
 endif()
