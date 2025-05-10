@@ -1,6 +1,7 @@
 #include "MyApplication.h"
 
 #include "RenderManager.h"
+#include "keyboard.h"
 #include "log.h"
 #include "application.h"
 #include "big_man_model.h"
@@ -12,32 +13,32 @@
 
 void MyApplication::onProjectLoad()
 {
-    auto geometryNode = std::make_shared<GeometryEx>();
+    geometryNode = std::make_shared<GeometryEx>();
 	geometryNode->setName("GeometryModel");
 	geometryNode->setVisible(false);
 	RenderManager::getInstance().addNode(geometryNode);
 
-	auto windowNode = std::make_shared<WindowModel>();
+	windowNode = std::make_shared<WindowModel>();
 	windowNode->setName("Window");
 	windowNode->setVisible(false);
 	RenderManager::getInstance().addNode(windowNode);
 
-	auto axioNode = std::make_shared<AxioModel>();
+	axioNode = std::make_shared<AxioModel>();
 	axioNode->setName("Axio");
 	axioNode->setVisible(false);
 	RenderManager::getInstance().addNode(axioNode);
 
-	auto bigmanNode = std::make_shared<BigManModel>();
+	bigmanNode = std::make_shared<BigManModel>();
 	bigmanNode->setName("BigMan");
 	bigmanNode->setVisible(true);
 	RenderManager::getInstance().addNode(bigmanNode);
 
-	auto triangleNode = std::make_shared<TriangleModel>();
+	triangleNode = std::make_shared<TriangleModel>();
 	triangleNode->setName("Triangle");
 	triangleNode->setVisible(false);
 	RenderManager::getInstance().addNode(triangleNode);
 
-	auto instanceExNode = std::make_shared<InstancingEx>();
+	instanceExNode = std::make_shared<InstancingEx>();
 	instanceExNode->setName("instanceEx");
 	instanceExNode->setVisible(false);
 	RenderManager::getInstance().addNode(instanceExNode);
@@ -46,6 +47,14 @@ void MyApplication::onProjectLoad()
 void MyApplication::onKeyInputEvent(const KeyEvent& keyEvent, const KeyActionEvent& keyActionEvent)
 {
     LOGD("key: {}, action: {}", static_cast<int>(keyEvent), static_cast<int>(keyActionEvent));
+
+	if (keyEvent == KeyEvent::KEY_F && keyActionEvent == KeyActionEvent::PRESS) {
+		if (bigmanNode->getVisible()) {
+			bigmanNode->setVisible(false);
+		} else {
+			bigmanNode->setVisible(true);
+		}
+	} 
 }
 
 
