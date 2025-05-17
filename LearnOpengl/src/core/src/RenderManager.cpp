@@ -50,3 +50,14 @@ void RenderManager::setMPV(const glm::mat4& projection, const glm::mat4& view, c
         item->setModel(model);
     }
 }
+
+RenderManager::NodeSPtrVec::iterator RenderManager::begin()
+{
+    return m_RenderNodes.begin();
+}
+
+RenderManager::NodeSPtrVec::iterator RenderManager::end()
+{
+    return m_RenderNodes.end();
+}
+

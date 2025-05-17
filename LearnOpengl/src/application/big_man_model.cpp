@@ -23,8 +23,8 @@ void BigManModel::draw()
 	m_shader.use();
 	m_shader.setMat4("view", m_view);
 	m_shader.setMat4("projection", m_projection);
-	m_model = glm::translate(m_model, glm::vec3(0.0f, 0.0f, 0.0f));
-	m_model = glm::scale(m_model, glm::vec3(1.0f, 1.0f, 1.0f));
+	// m_model = glm::translate(m_model, glm::vec3(0.0f, 0.0f, 0.0f));
+	// m_model = glm::scale(m_model, glm::vec3(1.0f, 1.0f, 1.0f));
 	m_shader.setMat4("model", m_model);
 	m_shader.setVec3("light.position", m_lightPosition);
 	m_shader.setVec3("light.diffuse", m_light.diffuse);

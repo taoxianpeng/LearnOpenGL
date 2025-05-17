@@ -5,11 +5,18 @@
 #include <memory>
 
 class RenderManager {
+
+  using NodeSPtr = std::shared_ptr<Node>;
+  using NodeSPtrVec = std::vector<NodeSPtr>;
+
 public:
   static RenderManager& getInstance() {
     static RenderManager renderManager;
     return renderManager;
   }
+
+  NodeSPtrVec::iterator begin();
+  NodeSPtrVec::iterator end();
 
   void loadResource();
   void drawAll();
@@ -23,5 +30,5 @@ private:
   ~RenderManager() = default;
 
 private:
-  std::vector<std::shared_ptr<Node>> m_RenderNodes;
+  NodeSPtrVec m_RenderNodes;
 };

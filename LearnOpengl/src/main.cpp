@@ -7,12 +7,11 @@
 #include "common.h"
 #include "log.h"
 #include "camera.h"
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
+#include "editor.h"
 #include "direction.h"
 #include "RenderManager.h"
 #include "keyboard.h"
+#include "imgui.h"
 
 using namespace std;
 
@@ -51,13 +50,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 	glViewport(0, 0, width, height);
 }
 
-void framebufferWindow(GLuint textureID) {
-	ImGui::Begin("Preview window");
-	float scale_factor = std::min((float)ImGui::GetContentRegionAvail().x / 800.0f, (float)ImGui::GetContentRegionAvail().y / 600.0f);
-	ImGui::Image((ImTextureID)(intptr_t)textureID, ImVec2(800 * scale_factor, 600 * scale_factor), ImVec2(1, 1), ImVec2(0, 0));
-	ImGui::End();
-}
-
 
 int main(int argc, char** argv) {
 
@@ -72,7 +64,6 @@ int main(int argc, char** argv) {
 	glfwSetErrorCallback(glfw_error_callback);
 	if (!glfwInit()) return 1;
 
-	const char* glsl_version = "#version 130";
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
@@ -94,6 +85,8 @@ int main(int argc, char** argv) {
 	gladLoadGL();
 	glfwSwapInterval(1);  // Enable vsync
 
+	Editor editor;
+	editor.init(window);
 
 	application->initializeGL();
 	application->onProjectLoad();
@@ -115,44 +108,28 @@ int main(int argc, char** argv) {
 	// 帧缓冲 End
 
 
-	// Setup Dear ImGui context
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO();
-	(void)io;
-	io.ConfigFlags |=
-		ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
-	io.ConfigFlags |=
-		ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
-
-	// Setup Dear ImGui style
-	ImGui::StyleColorsDark();
-	// ImGui::StyleColorsLight();
-
-	// Setup Platform/Renderer backends
-	ImGui_ImplGlfw_InitForOpenGL(window, true);
-	ImGui_ImplOpenGL3_Init(glsl_version);
-
-	bool show_demo_window = false;
-	bool show_another_window = false;
-	glm::vec4 clear_color(0.45f, 0.55f, 0.60f, 1.00f);
 
 
-	// light
-	static Light light_material;
-	light_material.ambient = glm::vec3(1.0f, 0.5f, 0.31f);
-	light_material.diffuse = glm::vec3(1.0f, 0.5f, 0.31f);
-	light_material.speculer = glm::vec3(1.0f, 0.5f, 0.31f);
-	light_material.position = glm::vec3(1.2f, 1.0f, 2.0f);
+	// bool show_demo_window = false;
+	// bool show_another_window = false;
+	// glm::vec4 clear_color(0.45f, 0.55f, 0.60f, 1.00f);
 
-	// material
-	static Material object_material;
-	object_material.ambient = glm::vec3(1.0f, 0.5f, 0.31f);
-	object_material.diffuse = glm::vec3(1.0f, 0.5f, 0.31f);
-	object_material.speculer = glm::vec3(1.0f, 0.5f, 0.31f);
-	object_material.shininess = 32.0f;
 
-	static glm::vec3 light_position = glm::vec3(1.0f, 1.0f, 1.0f);
+	// // light
+	// static Light light_material;
+	// light_material.ambient = glm::vec3(1.0f, 0.5f, 0.31f);
+	// light_material.diffuse = glm::vec3(1.0f, 0.5f, 0.31f);
+	// light_material.speculer = glm::vec3(1.0f, 0.5f, 0.31f);
+	// light_material.position = glm::vec3(1.2f, 1.0f, 2.0f);
+
+	// // material
+	// static Material object_material;
+	// object_material.ambient = glm::vec3(1.0f, 0.5f, 0.31f);
+	// object_material.diffuse = glm::vec3(1.0f, 0.5f, 0.31f);
+	// object_material.speculer = glm::vec3(1.0f, 0.5f, 0.31f);
+	// object_material.shininess = 32.0f;
+
+	// static glm::vec3 light_position = glm::vec3(1.0f, 1.0f, 1.0f);
 
 	// 加载纹理
 	// Texture quartTex;
@@ -178,24 +155,21 @@ int main(int argc, char** argv) {
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		// Start the Dear ImGui frame
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplGlfw_NewFrame();
-		ImGui::NewFrame();
+		editor.startFrameRender();
 
-		if (show_demo_window) ImGui::ShowDemoWindow(&show_demo_window);
+		// if (show_demo_window) ImGui::ShowDemoWindow(&show_demo_window);
 
-		// 3. Show another simple window.
-		if (show_another_window) {
-			ImGui::Begin(
-				"Another Window",
-				&show_another_window);  // Pass a pointer to our bool variable (the
-			// window will have a closing button that will
-			// clear the bool when clicked)
-			ImGui::Text("Hello from another window!");
-			if (ImGui::Button("Close Me")) show_another_window = false;
-			ImGui::End();
-		}
+		// // 3. Show another simple window.
+		// if (show_another_window) {
+		// 	ImGui::Begin(
+		// 		"Another Window",
+		// 		&show_another_window);  // Pass a pointer to our bool variable (the
+		// 	// window will have a closing button that will
+		// 	// clear the bool when clicked)
+		// 	ImGui::Text("Hello from another window!");
+		// 	if (ImGui::Button("Close Me")) show_another_window = false;
+		// 	ImGui::End();
+		// }
 
 		// Rendering
 		CheckCall(glClearColor(0.2f, 0.3f, 0.3f, 1.0f));
@@ -216,61 +190,57 @@ int main(int argc, char** argv) {
 		glm::mat4 model = glm::mat4(1.0f);
 		
 		RenderManager::getInstance().setMPV(projection, view, model);
+
+		editor.updateEditorGUI();
+
 		RenderManager::getInstance().drawAll();
 
-		{
-			static float f = 0.0f;
-			static int counter = 0;
+		// {
+		// 	static float f = 0.0f;
+		// 	static int counter = 0;
 
-			ImGui::Begin("Hello, world!");  // Create a window called "Hello, world!"
-			// and append into it.
+		// 	ImGui::Begin("Hello, world!");  // Create a window called "Hello, world!"
+		// 	// and append into it.
 
-			ImGui::Text("Color_1");
-			// ImGui::InputFloat("X", (float*)&light_position.x);
-			// ImGui::InputFloat("Y", (float*)&light_position.y);
-			// ImGui::InputFloat("Z", (float*)&light_position.z);
-			ImGui::SliderFloat("X", &light_position.x, -10.0f, 10.0f);
-			ImGui::SliderFloat("Y", &light_position.y, -10.0f, 10.0f);
-			ImGui::SliderFloat("Z", &light_position.z, -10.0f, 10.0f);
-			ImGui::ColorEdit3("light ambient", (float*)&light_material.ambient);
-			ImGui::ColorEdit3("light diffuse", (float*)&light_material.diffuse);
-			ImGui::ColorEdit3("light specular", (float*)&light_material.speculer);
+		// 	ImGui::Text("Color_1");
+		// 	// ImGui::InputFloat("X", (float*)&light_position.x);
+		// 	// ImGui::InputFloat("Y", (float*)&light_position.y);
+		// 	// ImGui::InputFloat("Z", (float*)&light_position.z);
+		// 	ImGui::SliderFloat("X", &light_position.x, -10.0f, 10.0f);
+		// 	ImGui::SliderFloat("Y", &light_position.y, -10.0f, 10.0f);
+		// 	ImGui::SliderFloat("Z", &light_position.z, -10.0f, 10.0f);
+		// 	ImGui::ColorEdit3("light ambient", (float*)&light_material.ambient);
+		// 	ImGui::ColorEdit3("light diffuse", (float*)&light_material.diffuse);
+		// 	ImGui::ColorEdit3("light specular", (float*)&light_material.speculer);
 
-			ImGui::Spacing();
-			ImGui::ColorEdit3("object ambient", (float*)&object_material.ambient);
-			ImGui::ColorEdit3("object diffuse", (float*)&object_material.diffuse);
-			ImGui::ColorEdit3("object specular", (float*)&object_material.speculer);
-			// shininess
-			ImGui::SetNextItemWidth(150);
-			ImGui::SliderFloat("shininess", &object_material.shininess, 0.0f, 128.0f);
+		// 	ImGui::Spacing();
+		// 	ImGui::ColorEdit3("object ambient", (float*)&object_material.ambient);
+		// 	ImGui::ColorEdit3("object diffuse", (float*)&object_material.diffuse);
+		// 	ImGui::ColorEdit3("object specular", (float*)&object_material.speculer);
+		// 	// shininess
+		// 	ImGui::SetNextItemWidth(150);
+		// 	ImGui::SliderFloat("shininess", &object_material.shininess, 0.0f, 128.0f);
 
-			ImGui::Spacing();
-			ImGui::Text("lastX = %f", lastX);
-			ImGui::Text("lastY = %f", lastY);
+		// 	ImGui::Spacing();
+		// 	ImGui::Text("lastX = %f", lastX);
+		// 	ImGui::Text("lastY = %f", lastY);
 
-			ImGui::Text(
-				"camera front = (%f,%f,%f) | up = (%f,%f,%f) | right = (%f,%f,%f)",
-				camera.Front.x, camera.Front.y, camera.Front.z, camera.Up.x,
-				camera.Up.y, camera.Up.z, camera.Position.x, camera.Position.y,
-				camera.Position.z);
+		// 	ImGui::Text(
+		// 		"camera front = (%f,%f,%f) | up = (%f,%f,%f) | right = (%f,%f,%f)",
+		// 		camera.Front.x, camera.Front.y, camera.Front.z, camera.Up.x,
+		// 		camera.Up.y, camera.Up.z, camera.Position.x, camera.Position.y,
+		// 		camera.Position.z);
 
-			ImGui::End();
-		}	
+		// 	ImGui::End();
+		// }	
 
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
+		editor.endFrameRender();
 		// Render
 		glfwSwapBuffers(window);
-
-		// 解除绑定
-		CheckCall(glBindVertexArray(0));
 	}
 
-	ImGui_ImplOpenGL3_Shutdown();
-	ImGui_ImplGlfw_Shutdown();
-	ImGui::DestroyContext();
-
+	editor.destory();
 	glfwDestroyWindow(window);
 	glfwTerminate();
 	return 0;

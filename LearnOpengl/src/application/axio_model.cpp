@@ -22,7 +22,7 @@ void AxioModel::loadData()
 void AxioModel::draw()
 {
 
-  m_shader.use();
+  	m_shader.use();
 	m_shader.setMat4("view", m_view);
 	m_shader.setMat4("projection", m_projection);
 	m_model = glm::translate(m_model, glm::vec3(0.0f, 0.0f, 0.0f));

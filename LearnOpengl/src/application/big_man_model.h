@@ -1,5 +1,6 @@
 #pragma once
 #include "node.h"
+#include <rttr/registration.h>
 
 class BigManModel : public Node
 {
@@ -33,6 +34,8 @@ public:
     return m_camera;
   }
 
+  RTTR_ENABLE()
+
 private:
   Shader m_shader;
   MMesh::Model m_meshModel;
@@ -41,3 +44,11 @@ private:
   Light m_light;
 };
 
+RTTR_REGISTRATION
+{
+    rttr::registration::class_<BigManModel>("BigMan")
+        .constructor<>()
+        .method("Transformation", &BigManModel::setTransformation)
+        .method("Rotation", &BigManModel::setRotation)
+        .method("Scale", &BigManModel::setScale);
+}
