@@ -99,7 +99,30 @@ void Editor::updateEditorGUI()
 						if (ImGui::SliderFloat3(propertyName.c_str(), &value.x, -100.0f, 100.0f)) {
 							method.invoke(*(iter->get()),value);
 						}
+					} else if (propertyName == "int") {
+						rttr::variant ret = getMethod.invoke(*(iter->get()));
+						if (!ret.is_valid() || !ret.is_type<int>()) {
+							LOGD("ret is unvalid or type is not int");
+							continue;
+						}
+						int value = ret.get_value<int>();
+
+						if (ImGui::SliderInt(propertyName.c_str(), &value, -10, 10)) {
+							method.invoke(*(iter->get()),value);
+						}
+					} else if (propertyName == "float") {
+						rttr::variant ret = getMethod.invoke(*(iter->get()));
+						if (!ret.is_valid() || !ret.is_type<float>()) {
+							LOGD("ret is unvalid or type is not float");
+							continue;
+						}
+						auto value = ret.get_value<float>();
+
+						if (ImGui::SliderFloat(propertyName.c_str(), &value, -10.0f, 10.0f)) {
+							method.invoke(*(iter->get()),value);
+						}
 					}
+
 					i++;
 				}	
 
