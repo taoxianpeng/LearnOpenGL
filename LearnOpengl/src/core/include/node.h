@@ -1,17 +1,21 @@
 #pragma once
 
 #include "glm/detail/qualifier.hpp"
+#include "glm/ext/matrix_float4x4.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/ext/vector_float3.hpp"
 #include "glm/fwd.hpp"
+#include "glm/gtc/quaternion.hpp"
 #include "glm/trigonometric.hpp"
 #include <string>
 #include <spdlog/spdlog.h>
 
+#define GLM_ENABLE_EXPERIMENTAL
 #if WIN32
 #include <glm.hpp>
 #else
 #include <glm/glm.hpp>
+#include <glm/gtx/string_cast.hpp>
 #endif
 
 #include "camera.h"
@@ -70,28 +74,27 @@ public:
     return m_projection;
   }
 
-  void setTransformation(const glm::vec3& transformation) {
-    m_transformation = transformation;
-    m_model = glm::translate(m_model, m_transformation);
+  void setTranslation(const glm::vec3& translation) {
+    m_translation = translation;
+    updateModelMat();
   }
 
   void setScale(const glm::vec3& scale) {
     m_scale = scale;
-    m_model = glm::scale(m_model, m_scale);
+    updateModelMat();
   }
 
   void setRotation(const glm::vec3& rotation) {
     m_rotation = rotation;
-    // x axio rotate
-    m_model = glm::rotate(m_model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-    // y axio rotate
-    m_model = glm::rotate(m_model, glm::radians(rotation.x), glm::vec3(0.0f, 1.0f, 0.0f));
-    // z axio rotate
-    m_model = glm::rotate(m_model, glm::radians(rotation.x), glm::vec3(0.0f, 0.0f, 1.0f));
+    glm::quat quatX = glm::angleAxis(glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f)); // X 轴旋转
+    glm::quat quatY = glm::angleAxis(glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f)); // Y 轴旋转
+    glm::quat quatZ = glm::angleAxis(glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f)); // Z 轴旋转
+    m_rotationQuat = quatX * quatY * quatZ; // 组合旋转顺序：Y→X→Z
+    updateModelMat();
   }
 
-  const glm::vec3& getTransformation() const {
-    return m_transformation;
+  const glm::vec3& getTranslation() const {
+    return m_translation;
   }
 
   const glm::vec3& getScale() const {
@@ -106,13 +109,23 @@ public:
 
 protected:
   glm::mat4 m_view;
-  glm::mat4 m_model;
+  glm::mat4 m_model = glm::mat4(1.0f);
   glm::mat4 m_projection;
 
-  glm::vec3 m_transformation;
+  glm::vec3 m_translation;
   glm::vec3 m_rotation;
-  glm::vec3 m_scale;
+  glm::quat m_rotationQuat;
+  glm::vec3 m_scale = glm::vec3(1.0f, 1.0f, 1.0f);
 
   bool m_visible = false;
   std::string m_name;
+
+private:
+  void updateModelMat() {
+    m_model = glm::mat4(1.0f);
+    m_model = glm::translate(m_model, m_translation);
+    m_model = m_model * glm::mat4_cast(m_rotationQuat);
+    m_model = glm::scale(m_model, m_scale);
+    m_model = m_model;
+  }
 };

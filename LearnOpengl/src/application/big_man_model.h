@@ -1,6 +1,8 @@
 #pragma once
+#include "glm/ext/vector_float3.hpp"
 #include "node.h"
 #include <rttr/registration.h>
+#include <rttr/type.h>
 
 class BigManModel : public Node
 {
@@ -48,7 +50,19 @@ RTTR_REGISTRATION
 {
     rttr::registration::class_<BigManModel>("BigMan")
         .constructor<>()
-        .method("Transformation", &BigManModel::setTransformation)
-        .method("Rotation", &BigManModel::setRotation)
-        .method("Scale", &BigManModel::setScale);
+        .method("setTranslation", &BigManModel::setTranslation)(
+          rttr::parameter_names("vec3"),
+          rttr::default_arguments(glm::vec3(0.0f, 0.0f, 0.0f))
+        )
+        .method("getTranslation", &BigManModel::getTranslation)
+        .method("setRotation", &BigManModel::setRotation)(
+          rttr::parameter_names("vec3"),
+          rttr::default_arguments(glm::vec3(0.0f, 0.0f, 0.0f))
+        )
+        .method("getRotation", &BigManModel::getRotation)
+        .method("setScale", &BigManModel::setScale)(
+          rttr::parameter_names("vec3"),
+          rttr::default_arguments(glm::vec3(1.0f, 1.0f, 1.0f))
+        )
+        .method("getScale", &BigManModel::getScale);
 }

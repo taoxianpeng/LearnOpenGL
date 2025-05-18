@@ -1,12 +1,16 @@
 #include "editor.h"
+#include "glm/ext/vector_float3.hpp"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include <rttr/registration.h>
 #include "RenderManager.h"
 #include "log.h"
+#include "rttr/variant.h"
 
 #include <iostream>
+#include <string>
+#include <string_view>
 
 const char* glsl_version = "#version 130";
 
@@ -60,25 +64,53 @@ void Editor::updateEditorGUI()
 {
 	ImGui::Begin("Node Editor");
     for (auto iter = RenderManager::getInstance().begin(); iter != RenderManager::getInstance().end(); ++iter) {
-        auto nodeType = rttr::type::get(*(*iter));
+        auto nodeType = rttr::type::get(*(iter->get()));
         
         if (!nodeType.is_class()) {
             continue;
         }
 
-    	ImGui::BulletText(nodeType.get_name().to_string().c_str());
-		// LOGD("nodetpye: {}", nodeType.get_name().to_string())
-        for (auto& method : nodeType.get_methods()) {
-            // LOGD("******** property: {}", ).to_string());
-			// ImGui::BulletText(prop.get_name().to_string().c_str());
-            ImGui::BulletText(method.get_name().to_string().c_str());
-			for (auto& para : method.get_parameter_infos()) {
-            	ImGui::BulletText(para.get_name().to_string().c_str());
+		ImGui::PushID(iter->get());
+		if (ImGui::TreeNode(nodeType.get_name().to_string().c_str())) {
+			const auto& methods = nodeType.get_methods();
+			for (const auto& method : methods) {
+				ImGui::PushID(method.get_name().to_string().c_str());
+				
+				// TODO: 对字符串前缀进行判断
+				std::string functionName = method.get_name().to_string().substr(3);
+				const auto& getMethod = nodeType.get_method("get"+functionName);
+
+				ImGui::BulletText(functionName.c_str());
+
+				size_t i = 0;
+				for (const auto& property : method.get_parameter_infos()) {
+					if (i > 0 && i < method.get_parameter_infos().size()-2) {
+						ImGui::SameLine();
+					}
+					const auto propertyName = property.get_name().to_string();
+					if (propertyName == "vec3") {
+						rttr::variant ret = getMethod.invoke(*(iter->get()));
+						if (!ret.is_valid() || !ret.is_type<glm::vec3>()) {
+							LOGD("ret is unvalid or type is not vec3");
+							continue;
+						}
+						glm::vec3 value = ret.get_value<glm::vec3>();
+
+						if (ImGui::SliderFloat3(propertyName.c_str(), &value.x, -100.0f, 100.0f)) {
+							method.invoke(*(iter->get()),value);
+						}
+					}
+					i++;
+				}	
+
+				ImGui::PopID();
 			}
 
-        }
+			ImGui::TreePop();
+		}
 
-		
+		ImGui::PopID();
+
     }
 	ImGui::End();
 }

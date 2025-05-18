@@ -187,12 +187,9 @@ int main(int argc, char** argv) {
 			glm::radians(camera.Zoom),
 			static_cast<float>(SCR_WIDTH) / static_cast<float>(SCR_HEIGHT), 0.1f,
 			100.0f);
-		glm::mat4 model = glm::mat4(1.0f);
 		
-		RenderManager::getInstance().setMPV(projection, view, model);
-
+		RenderManager::getInstance().setPV(projection, view);
 		editor.updateEditorGUI();
-
 		RenderManager::getInstance().drawAll();
 
 		// {

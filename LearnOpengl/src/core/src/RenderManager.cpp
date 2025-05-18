@@ -42,12 +42,11 @@ std::shared_ptr<Node>& RenderManager::findNode(const std::string& name)
     return emptyNode;
 }
 
-void RenderManager::setMPV(const glm::mat4& projection, const glm::mat4& view, const glm::mat4& model)
+void RenderManager::setPV(const glm::mat4& projection, const glm::mat4& view)
 {
     for (auto& item : m_RenderNodes) {
         item->setProjection(projection);
         item->setView(view);
-        item->setModel(model);
     }
 }
 
