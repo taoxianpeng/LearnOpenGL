@@ -20,12 +20,28 @@ public:
     return m_lightPosition;
   }
 
-  void setLightMaterial(const Light& light) {
-    m_light = light;
+  void setLightAmbient(const glm::vec3& ambient) {
+    m_light.ambient = ambient;
   }
 
-  const Light& getLightMaterial() const {
-    return m_light;
+  const glm::vec3& getLightAmbient() const {
+    return m_light.ambient;
+  }
+
+  void setLightDiffuse(const glm::vec3& diffuse) {
+    m_light.diffuse = diffuse;
+  }
+
+  const glm::vec3& getLightDiffuse() const {
+    return m_light.diffuse;
+  }
+
+  void setLightSpeculer(const glm::vec3& speculer) {
+    m_light.speculer = speculer;
+  }
+
+  const glm::vec3& getLightSpeculer() const {
+    return m_light.speculer;
   }
 
   void setCamera(const Camera& camera) {
@@ -64,5 +80,30 @@ RTTR_REGISTRATION
           rttr::parameter_names("vec3"),
           rttr::default_arguments(glm::vec3(1.0f, 1.0f, 1.0f))
         )
-        .method("getScale", &BigManModel::getScale);
+        .method("getScale", &BigManModel::getScale)
+        .method("setVisible", &BigManModel::setVisible)(
+          rttr::parameter_names("bool"),
+          rttr::default_arguments(false)
+        )
+        .method("getVisible", &BigManModel::getVisible)
+        .method("setLightPosition", &BigManModel::setLightPosition)(
+          rttr::parameter_names("vec3"),
+          rttr::default_arguments(glm::vec3(0.0f, 0.0f, 0.0f))
+        )
+        .method("getLightPosition", &BigManModel::getLightPositon)
+        .method("setLightDiffuse", &BigManModel::setLightDiffuse)(
+          rttr::parameter_names("vec3"),
+          rttr::default_arguments(glm::vec3(0.0f, 0.0f, 0.0f))
+        )
+        .method("getLightDiffuse", &BigManModel::getLightDiffuse)
+        .method("setLightAmbient", &BigManModel::setLightAmbient)(
+          rttr::parameter_names("vec3"),
+          rttr::default_arguments(glm::vec3(0.0f, 0.0f, 0.0f))
+        )
+        .method("getLightAmbient", &BigManModel::getLightAmbient)
+        .method("setLightSpeculer", &BigManModel::setLightSpeculer)(
+          rttr::parameter_names("vec3"),
+          rttr::default_arguments(glm::vec3(0.0f, 0.0f, 0.0f))
+        )
+        .method("getLightSpeculer", &BigManModel::getLightSpeculer);
 }

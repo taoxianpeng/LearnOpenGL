@@ -26,7 +26,7 @@ void BigManModel::draw()
 	// m_model = glm::translate(m_model, glm::vec3(0.0f, 0.0f, 0.0f));
 	// m_model = glm::scale(m_model, glm::vec3(1.0f, 1.0f, 1.0f));
 	m_shader.setMat4("model", m_model);
-	LOGD("aaa {}", glm::to_string(m_model));
+	// LOGD("aaa {}", glm::to_string(m_model));
 	m_shader.setVec3("light.position", m_lightPosition);
 	m_shader.setVec3("light.diffuse", m_light.diffuse);
 	m_shader.setVec3("viewPos", m_camera.Position);

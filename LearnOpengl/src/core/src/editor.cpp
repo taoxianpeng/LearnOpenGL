@@ -77,7 +77,13 @@ void Editor::updateEditorGUI()
 				ImGui::PushID(method.get_name().to_string().c_str());
 				
 				// TODO: 对字符串前缀进行判断
-				std::string functionName = method.get_name().to_string().substr(3);
+				std::string methodName = method.get_name().to_string();
+				if (methodName.substr(0,3) == "get") {
+					ImGui::PopID();
+					continue;
+				}
+
+				std::string functionName = methodName.substr(3);
 				const auto& getMethod = nodeType.get_method("get"+functionName);
 
 				ImGui::BulletText(functionName.c_str());
@@ -119,6 +125,17 @@ void Editor::updateEditorGUI()
 						auto value = ret.get_value<float>();
 
 						if (ImGui::SliderFloat(propertyName.c_str(), &value, -10.0f, 10.0f)) {
+							method.invoke(*(iter->get()),value);
+						}
+					} else if (propertyName == "bool") {
+						rttr::variant ret = getMethod.invoke(*(iter->get()));
+						if (!ret.is_valid() || !ret.is_type<bool>()) {
+							LOGD("ret is unvalid or type is not float");
+							continue;
+						}
+						auto value = ret.get_value<bool>();
+
+						if (ImGui::Checkbox(propertyName.c_str(), &value)) {
 							method.invoke(*(iter->get()),value);
 						}
 					}
