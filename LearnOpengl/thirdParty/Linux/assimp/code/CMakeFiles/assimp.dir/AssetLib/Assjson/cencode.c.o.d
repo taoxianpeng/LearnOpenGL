@@ -1,4 +1,0 @@
-code/CMakeFiles/assimp.dir/AssetLib/Assjson/cencode.c.o: \
- /home/txp/Documents/LearnOpenGL/LearnOpengl/thirdParty/Linux/assimp/code/AssetLib/Assjson/cencode.c \
- /usr/include/stdc-predef.h \
- /home/txp/Documents/LearnOpenGL/LearnOpengl/thirdParty/Linux/assimp/code/AssetLib/Assjson/cencode.h

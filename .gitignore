@@ -6,3 +6,4 @@ build
 build_vs2022
 .xmake/
 compile_commands.json
+LearnOpengl/vsxmake2022/

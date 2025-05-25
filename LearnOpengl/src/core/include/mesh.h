@@ -1,15 +1,9 @@
 ﻿#ifndef MESH_H
 #define MESH_H
 
-#if WIN32
-#include <glm.hpp>
-#include <gtc/matrix_transform.hpp>
-#include <gtc/type_ptr.hpp>
-#else
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#endif
 
 #include <string>
 #include <string_view>

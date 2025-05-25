@@ -11,12 +11,8 @@
 #include <spdlog/spdlog.h>
 
 #define GLM_ENABLE_EXPERIMENTAL
-#if WIN32
-#include <glm.hpp>
-#else
 #include <glm/glm.hpp>
 #include <glm/gtx/string_cast.hpp>
-#endif
 
 #include "camera.h"
 #include "common.h"

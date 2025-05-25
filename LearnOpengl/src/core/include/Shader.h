@@ -1,13 +1,8 @@
 #ifndef SHADER_H
 #define SHADER_H
+
 #include <glad/glad.h>
-
-#if WIN32
-#include <glm.hpp>
-#else
 #include <glm/glm.hpp>
-#endif
-
 #include <string>
 
 class Shader {
