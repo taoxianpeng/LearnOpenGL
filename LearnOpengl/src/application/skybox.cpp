@@ -71,9 +71,10 @@ void SkyBox::loadData()
     resourcePath + "/resource/skybox/back.jpg"
   };
 
-  m_cubmapTextureID = loadCubeMap(faces);
+  GLuint id = loadCubeMap(faces);
+  setCubmapTextureID(id);
   
-  if (m_cubmapTextureID != 0) {
+  if (getCubmapTextureID() != 0) {
     LOGD("skybox texture load ok!");
   }
   else {
@@ -88,14 +89,16 @@ void SkyBox::loadData()
 
 void SkyBox::draw()
 {
+  CheckCall(glDepthMask(GL_FALSE));
   m_shader.use();
   m_shader.setMat4("view", m_view);
   m_shader.setMat4("projection", m_projection);
   m_shader.setMat4("model", m_model);
-
-  CheckCall(glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubmapTextureID));
+  GLuint textureID = getCubmapTextureID();
+  CheckCall(glBindTexture(GL_TEXTURE_CUBE_MAP, textureID));
   CheckCall(glBindVertexArray(m_VAO));
   CheckCall(glDrawArrays(GL_TRIANGLES, 0, 36));
+  CheckCall(glDepthMask(GL_TRUE));
 }
 
 unsigned int SkyBox::loadCubeMap(const std::vector<std::string>& faces)

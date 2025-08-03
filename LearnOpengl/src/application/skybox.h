@@ -9,7 +9,6 @@ public:
   SkyBox() = default;
   ~SkyBox() = default;
 
-  const GLuint getCubmapTextureID() const;
   //void setCubmapUrl(const std::vector<std::string>& cubmapFileUrl);
   void loadData() override;
   void draw() override;
@@ -23,6 +22,5 @@ private:
   std::vector<std::string> imagePath;
   GLuint m_VAO = 0;
   GLuint m_VBO = 0;
-  unsigned int m_cubmapTextureID = 0;
   Shader m_shader;
 };

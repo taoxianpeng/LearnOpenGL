@@ -40,11 +40,11 @@ public:
   explicit Node() = default;
   virtual ~Node() = default;
 
-  void setName(const std::string& name) {
+  void setName(std::string_view name) {
     m_name = name;
   }
 
-  const std::string& getName() const {
+  std::string_view getName() const {
     return m_name;
   }
 
@@ -114,7 +114,7 @@ public:
     return m_rotation;
   }
 
-  const GLuint getCubmapTextureID() const {
+  GLuint getCubmapTextureID() const {
     return m_cubmapTextureID;
   }
 
