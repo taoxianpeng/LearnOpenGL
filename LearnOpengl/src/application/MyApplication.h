@@ -21,6 +21,7 @@ private:
     std::shared_ptr<Node> bigmanNode;  
     std::shared_ptr<Node> triangleNode;  
     std::shared_ptr<Node> instanceExNode;  
+    std::shared_ptr<Node> skyBoxNode;  
 };
 
 Application* createApplication();

@@ -10,10 +10,16 @@
 #include "triangle_model.h"
 #include "geometry_ex.h"
 #include "Instancing_ex.h"
+#include "skybox.h"
 
 void MyApplication::onProjectLoad()
 {
-    geometryNode = std::make_shared<GeometryEx>();
+	skyBoxNode = std::make_shared<SkyBox>();
+	skyBoxNode->setName("SkyBox");
+	skyBoxNode->setVisible(true);
+	RenderManager::getInstance().addNode(skyBoxNode);
+
+  geometryNode = std::make_shared<GeometryEx>();
 	geometryNode->setName("GeometryModel");
 	geometryNode->setVisible(false);
 	RenderManager::getInstance().addNode(geometryNode);

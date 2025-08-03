@@ -186,7 +186,7 @@ int main(int argc, char** argv) {
 		glm::mat4 projection = glm::perspective(
 			glm::radians(camera.Zoom),
 			static_cast<float>(SCR_WIDTH) / static_cast<float>(SCR_HEIGHT), 0.1f,
-			100.0f);
+			1000.0f);
 		
 		RenderManager::getInstance().setPV(projection, view);
 		editor.updateEditorGUI();

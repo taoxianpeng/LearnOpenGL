@@ -54,7 +54,6 @@ GLuint Shader::createShader(const std::string& codeStr, GLuint shaderType)
 {
 	GLuint shader;
 	int success;
-	char infoLog[512];
 	const char* fShaderCode = codeStr.c_str();
 
 	shader = glCreateShader(shaderType);
@@ -62,6 +61,7 @@ GLuint Shader::createShader(const std::string& codeStr, GLuint shaderType)
 	CheckCall(glCompileShader(shader));
 	CheckCall(glGetShaderiv(shader, GL_COMPILE_STATUS, &success));
 	if (!success) {
+		char infoLog[512];
 		CheckCall(glGetShaderInfoLog(shader, 512, NULL, infoLog));
 		LOGE("ERROR::SHADER::FRAGMENT::COMPLIATION_FAILED {}", infoLog);
 	}
@@ -92,10 +92,10 @@ GLuint Shader::createProgram(const PipelineShader& pipelineShader)
 
 	if (shaderFlag.any()) {
 		int success;
-		char infoLog[512];
 		CheckCall(glLinkProgram(_program));
 		CheckCall(glGetProgramiv(_program, GL_LINK_STATUS, &success));
 		if (!success) {
+			char infoLog[512];
 			CheckCall(glGetProgramInfoLog(_program, 512, NULL, infoLog));
 			LOGE("ERROR::LinkProgram::LINK_FAILED {}", infoLog);
 		}
@@ -135,7 +135,7 @@ std::string Shader::readFromFile(const std::string& path)
 
 		code = vCodeStream.str();
 	}
-	catch (std::ifstream::failure e) {
+	catch (const std::exception& e) {
 		LOGE("ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ {}", e.what());
 	}
 

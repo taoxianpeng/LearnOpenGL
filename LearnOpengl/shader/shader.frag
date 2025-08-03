@@ -1,5 +1,7 @@
 #version 330 core
 
+#define BlinnPhone
+
 struct Light{ //带衰减的点光源
 	vec3 position;
 
@@ -47,8 +49,15 @@ void main()
     
     // specular
     vec3 viewDir = normalize(light.position - FragPos);
-    vec3 reflectDir = reflect(-lightDir, norm);  
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+    float spec = 0.0;
+    #ifdef BlinnPhone
+        vec3 halfWayDir = normalize(light.position + viewDir);
+        spec = pow(max(dot(norm, halfWayDir), 0.0), material.shininess);
+    #else
+        vec3 reflectDir = reflect(-lightDir, norm);  
+        spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+    #endif
+
     vec3 specular = light.specular * (spec * texture(material.texture_specular1, TexCoords).rgb);  
         
     ambient *= attenuation;

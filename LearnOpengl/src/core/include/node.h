@@ -21,7 +21,20 @@
 
 #include <rttr/registration.h>
 
-class Node
+class Object
+{
+public:
+
+  explicit Object() = default;
+  virtual ~Object() = default;
+
+  virtual void loadData() = 0;
+  virtual void draw() = 0;
+  
+  RTTR_ENABLE();
+};
+
+class Node : public Object
 {
 public:
   explicit Node() = default;
@@ -43,8 +56,8 @@ public:
     return m_visible;
   }
 
-  virtual void loadData() = 0;
-  virtual void draw() = 0; 
+  virtual void loadData() override {};
+  virtual void draw() override {};
 
   virtual void setView(const glm::mat4& view) {
     m_view = view;
@@ -101,6 +114,14 @@ public:
     return m_rotation;
   }
 
+  const GLuint getCubmapTextureID() const {
+    return m_cubmapTextureID;
+  }
+
+  void setCubmapTextureID(GLuint cubmapTextureID) {
+    m_cubmapTextureID = cubmapTextureID;
+  }
+
   RTTR_ENABLE();
 
 protected:
@@ -115,6 +136,8 @@ protected:
 
   bool m_visible = false;
   std::string m_name;
+
+  GLuint m_cubmapTextureID;
 
 private:
   void updateModelMat() {
