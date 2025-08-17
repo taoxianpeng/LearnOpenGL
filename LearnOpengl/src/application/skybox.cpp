@@ -90,13 +90,13 @@ void SkyBox::loadData()
 void SkyBox::draw()
 {
   CheckCall(glDepthMask(GL_FALSE));
+  GLuint textureID = getCubmapTextureID();
+  CheckCall(glBindTexture(GL_TEXTURE_CUBE_MAP, textureID));
+  CheckCall(glBindVertexArray(m_VAO));
   m_shader.use();
   m_shader.setMat4("view", m_view);
   m_shader.setMat4("projection", m_projection);
   m_shader.setMat4("model", m_model);
-  GLuint textureID = getCubmapTextureID();
-  CheckCall(glBindTexture(GL_TEXTURE_CUBE_MAP, textureID));
-  CheckCall(glBindVertexArray(m_VAO));
   CheckCall(glDrawArrays(GL_TRIANGLES, 0, 36));
   CheckCall(glDepthMask(GL_TRUE));
 }

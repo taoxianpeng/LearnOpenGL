@@ -22,6 +22,15 @@ public:
   void drawAll();
   void addNode(const std::shared_ptr<Node>& node);
   void removeNode();
+
+  void setSkyboxTextureID(GLuint id) {
+      m_SkyboxTextureId = id;
+  }
+
+  GLuint getSkyBoxTextureID() {
+    return m_SkyboxTextureId;
+  }
+
   void setPV(const glm::mat4& projection, const glm::mat4& view);
   std::shared_ptr<Node>& findNode(const std::string& name);
   
@@ -31,4 +40,5 @@ private:
 
 private:
   NodeSPtrVec m_RenderNodes;
+  GLuint m_SkyboxTextureId;
 };

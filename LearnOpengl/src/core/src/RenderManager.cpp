@@ -1,12 +1,17 @@
 #include "RenderManager.h"
 #include <algorithm>
 #include <memory>
+#include "skybox.h"
 
 void RenderManager::loadResource()
 {
     for (const auto& node : m_RenderNodes) {
         if (node->getVisible()) {
             node->loadData();
+        }
+
+        if (dynamic_cast<SkyBox*>(node.get())) {
+            setSkyboxTextureID(node->getCubmapTextureID());
         }
     }
 }
@@ -15,6 +20,9 @@ void RenderManager::drawAll()
 {
     for (const auto& node : m_RenderNodes) {
         if (node->getVisible()) {
+            if (getSkyBoxTextureID() > 0) {
+                node->setCubmapTextureID(getSkyBoxTextureID());
+            }
             node->draw();
         }
     }

@@ -20,7 +20,12 @@ void BigManModel::loadData()
 
 void BigManModel::draw()
 {
+	GLuint skyboxID = getCubmapTextureID();
+	//LOGD("skybox texture id: {}", skyboxID);
+	CheckCall(glActiveTexture(GL_TEXTURE2));
+	CheckCall(glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxID));
 	m_shader.use();
+	m_shader.setInt("skyBox", 2);
 	m_shader.setMat4("view", m_view);
 	m_shader.setMat4("projection", m_projection);
 	// m_model = glm::translate(m_model, glm::vec3(0.0f, 0.0f, 0.0f));
@@ -33,6 +38,9 @@ void BigManModel::draw()
 	m_shader.setFloat("light.constant", 1.0f);
 	m_shader.setFloat("light.linear", 0.09f);
 	m_shader.setFloat("light.quadratic", 0.032f);
+
+	//GLuint textureID = getCubmapTextureID();
+	//CheckCall(glBindTexture(GL_TEXTURE_CUBE_MAP, textureID));
 
 	m_meshModel.draw(m_shader);
 }

@@ -23,6 +23,8 @@ struct Material{
 
 uniform Material material;
 uniform Light light;
+uniform vec3 viewPos;
+uniform samplerCube skyBox;
 
 //uniform Light light;
 
@@ -32,10 +34,18 @@ in vec3 FragPos;
 
 out vec4 FragColor;
 
-
 void main()
 {    
     vec3 ambient = light.ambient * texture(material.texture_diffuse1, TexCoords).rgb;
+
+    // skybox
+    vec3 I = normalize(FragPos - viewPos);
+    vec3 R = reflect(I, normalize(Normal));
+    vec3 skyboxColor = texture(skyBox, R).rgb;
+    float ambientWeight = 0.6;
+    float skyBoxWeight = 0.4;
+    ambient = ambientWeight * ambient + skyBoxWeight * skyboxColor;
+
     // diffuse 
     float dist = length(light.position - FragPos);
     ////衰减算法
